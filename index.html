@@ -36,7 +36,7 @@
           background: #181f1b;
           border-radius: 10px;
           margin-bottom: 1.1rem;
-          box-shadow: 0 0 12px #00ff9022;
+          box-shadow: 0 0 16px #00ff90cc, 0 0 32px #00ff9022;
           padding: 0.7rem 1rem;
           transition: box-shadow 0.2s, background 0.2s;
           border: 1px solid #00ff9033;
@@ -48,7 +48,7 @@
         }
         .addon-tile:hover {
           background: #1a2d22;
-          box-shadow: 0 0 24px #00ff90cc;
+          box-shadow: 0 0 32px #00ff90, 0 0 48px #00ff90cc;
         }
         .addon-tile .addon-icon {
           width: 28px;
@@ -86,14 +86,15 @@
           font-size: 0.98rem;
           margin-bottom: 0.1rem;
           text-decoration: none;
-          box-shadow: 0 0 6px #00ff9022;
-          transition: background 0.2s, color 0.2s;
+          box-shadow: 0 0 12px #00ff90cc, 0 0 24px #00ff9022;
+          transition: background 0.2s, color 0.2s, box-shadow 0.2s;
           border: 1px solid #00ff9033;
           display: inline-block;
         }
         .addon-version-link:hover {
           background: #00ff90;
           color: #101010;
+          box-shadow: 0 0 32px #00ff90, 0 0 48px #00ff90cc;
         }
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-10px); }
