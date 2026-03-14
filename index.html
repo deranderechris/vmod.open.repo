@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kodi Repo Übersicht</title>
+  <style>
+    body {
+      background: #101010;
+      color: #00ff90;
+      font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    header {
+      background: #181818;
+      padding: 2rem 1rem 1rem 1rem;
+      text-align: center;
+      border-bottom: 2px solid #00ff90;
+      box-shadow: 0 2px 8px #00ff9033;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      color: #00ff90;
+      text-shadow: 0 0 8px #00ff90cc;
+    }
+    .addon-list {
+      max-width: 700px;
+      margin: 2rem auto;
+      background: #181818;
+      border-radius: 10px;
+      box-shadow: 0 0 16px #00ff9022;
+      padding: 2rem;
+      border: 1px solid #00ff90;
+    }
+    .addon-list h2 {
+      color: #00ff90;
+      margin-top: 0;
+      font-size: 1.5rem;
+      border-bottom: 1px solid #00ff90;
+      padding-bottom: 0.5rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      padding: 0.7rem 0;
+      border-bottom: 1px dashed #00ff90;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    li:last-child {
+      border-bottom: none;
+    }
+    .addon-icon {
+      width: 24px;
+      height: 24px;
+      background: #00ff90;
+      border-radius: 4px;
+      display: inline-block;
+      margin-right: 0.5rem;
+      box-shadow: 0 0 8px #00ff90cc;
+    }
+    .footer {
+      text-align: center;
+      color: #00ff90aa;
+      font-size: 0.9rem;
+      margin: 2rem 0 1rem 0;
+    }
+    a {
+      color: #00ff90;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    a:hover {
+      color: #00ffaa;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Kodi Repo Übersicht</h1>
+    <p>Willkommen zur modernen Kodi Repository Übersicht im Hacker-Look!</p>
+  </header>
+  <section class="addon-list">
+    <h2>Addons</h2>
+    <ul id="addonList">
+      <!-- Addons werden hier per JS eingefügt -->
+    </ul>
+  </section>
+  <div class="footer">
+    &copy; 2026 vmod.open.repo &ndash; <a href="https://github.com/deranderechris/vmod.open.repo">GitHub</a>
+  </div>
+  <script>
+    // Liste der Addons (aus dem Verzeichnis, statisch für Demo)
+    const addons = [
+      "plugin.audio.mixcloud",
+      "plugin.audio.mp3streams",
+      "plugin.audio.radio_de_light",
+      "plugin.close.kodi",
+      "plugin.image.pdfreader",
+      "plugin.program.autoenabler",
+      "plugin.program.browser.launcher",
+      "plugin.program.flowfavmanager",
+      "plugin.program.orderfavourites",
+      "plugin.program.simple.favourites",
+      "plugin.program.super.favourites",
+      "plugin.video.cb20",
+      "plugin.video.chaturbate",
+      "plugin.video.duffyou",
+      "plugin.video.empflix",
+      "plugin.video.f4mTester",
+      "plugin.video.fantasticc",
+      "plugin.video.hdtrailers_net",
+      "plugin.video.hdtrailers_net.reloaded",
+      "plugin.video.macvod",
+      "plugin.video.megakino",
+      "plugin.video.MetalOnMetal",
+      "plugin.video.MusicHall",
+      "plugin.video.next",
+      "plugin.video.now_music",
+      "plugin.video.sportliveevents",
+      "plugin.video.sportscentral",
+      "plugin.video.sportstreams",
+      "plugin.video.sr-regio",
+      "plugin.video.stalker",
+      "plugin.video.stalkermod",
+      "plugin.video.stalkervod",
+      "plugin.video.stbplus",
+      "plugin.video.playlistloader",
+      "plugin.video.tvlive",
+      "plugin.video.tvone",
+      "plugin.video.tvone11",
+      "plugin.video.tvone111",
+      "plugin.video.tvone1111",
+      "plugin.video.tvone1112",
+      "plugin.video.tvone112",
+      "plugin.video.vav",
+      "plugin.video.vavooto",
+      "plugin.video.vtv.live",
+      "plugin.video.xship",
+      "repository.kodi.media",
+      "repository.michaz",
+      "repository.seizu",
+      "script.favourites",
+      "script.module.addon.common",
+      "script.module.beautifulsoup",
+      "script.module.cloudscraper",
+      "script.module.futures",
+      "script.module.liveresolver",
+      "script.module.metahandler",
+      "script.module.parsedom",
+      "script.module.resolveurl.xxx",
+      "script.module.routing",
+      "script.module.singledispatch",
+      "script.module.slproxy",
+      "script.module.t0mm0.common",
+      "script.module.tzlocal",
+      "script.module.websocket",
+      "script.sites",
+      "script.video.F4mProxy",
+      "service.autoexec",
+      "service.autohideosd",
+      "service.subtitles.all_subs_plus"
+    ];
+    const list = document.getElementById('addonList');
+    addons.forEach(name => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="addon-icon"></span>${name}`;
+      list.appendChild(li);
+    });
+  </script>
+</body>
+</html>
