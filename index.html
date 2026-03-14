@@ -28,20 +28,35 @@
       text-shadow: 0 0 8px #00ff90cc;
     }
     .addon-list {
-      max-width: 700px;
+      max-width: 900px;
       margin: 2rem auto;
       background: #181818;
       border-radius: 10px;
       box-shadow: 0 0 16px #00ff9022;
       padding: 2rem;
       border: 1px solid #00ff90;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: space-between;
     }
-    .addon-list h2 {
-      color: #00ff90;
-      margin-top: 0;
-      font-size: 1.5rem;
-      border-bottom: 1px solid #00ff90;
-      padding-bottom: 0.5rem;
+    .addon-group {
+      flex: 1 1 350px;
+      min-width: 320px;
+        .addon-list {
+          max-width: 1200px;
+          margin: 2rem auto;
+          background: #181818;
+          border-radius: 18px;
+          box-shadow: 0 0 32px #00ff90aa, 0 0 80px #00ff9022 inset;
+          padding: 2.5rem 2rem;
+          border: 2px solid #00ff90;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2.5rem 2rem;
+        }
+      margin-bottom: 0.7rem;
+      letter-spacing: 1px;
     }
     ul {
       list-style: none;
@@ -49,9 +64,9 @@
       margin: 0;
     }
     li {
-      padding: 0.7rem 0;
+      padding: 0.5rem 0;
       border-bottom: 1px dashed #00ff90;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -60,8 +75,8 @@
       border-bottom: none;
     }
     .addon-icon {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       background: #00ff90;
       border-radius: 4px;
       display: inline-block;
@@ -92,128 +107,199 @@
       <a href="https://github.com/deranderechris/vmod.open.repo/releases/download/v1.0/repo-vmod.zip" style="display:inline-block;margin:1.5rem auto 0 auto;padding:0.7rem 1.5rem;background:#00ff90;color:#101010;font-weight:bold;border-radius:6px;text-decoration:none;box-shadow:0 0 8px #00ff90cc;transition:background 0.2s;">&#128229; Repo als ZIP herunterladen</a>
   </header>
   <section class="addon-list">
-    <h2>Addons</h2>
-    <ul id="addonList">
-      <!-- Addons werden hier per JS eingefügt -->
-    </ul>
+    <!-- Addon-Gruppen werden per JS eingefügt -->
+    <div id="addonGroups"></div>
   </section>
   <div class="footer">
     &copy; 2026 vmod.open.repo &ndash; <a href="https://github.com/deranderechris/vmod.open.repo">GitHub</a>
   </div>
   <script>
     // Addon-Name zu ZIP-Datei Mapping (aus dem Verzeichnis, automatisch generiert)
-    const addonZips = [
-      "plugin.audio.mixcloud-420.3.0.2.zip",
-      "plugin.audio.mixcloud-420.3.0.4.zip",
-      "plugin.audio.mp3streams-2025.0.1.zip",
-      "plugin.audio.radio_de_light-1.0.2.zip",
-      "plugin.close.kodi-3.1.3.zip",
-      "plugin.close.kodi-3.1.4.zip",
-      "plugin.image.pdfreader-2.0.3.zip",
-      "plugin.program.autoenabler-1.0.0.zip",
-      "plugin.program.autoenabler-1.0.1.zip",
-      "plugin.program.browser.launcher-2.0.0-Mod Kodi-19.zip",
-      "plugin.program.flowfavmanager-1.0.1.zip",
-      "plugin.program.orderfavourites-1.2.2a.zip",
-      "plugin.program.orderfavourites-1.2.3a.zip",
-      "plugin.program.simple.favourites-0.1.27d.zip",
-      "plugin.program.super.favourites-8888.w.zip",
-      "plugin.video.MetalOnMetal-1.0.14.zip",
-      "plugin.video.MusicHall-1.0.20.zip",
-      "plugin.video.cb20-2.2.5.zip",
-      "plugin.video.chaturbate-2.4.5.zip",
-      "plugin.video.duffyou-0.2.1.zip",
-      "plugin.video.empflix-2.1.1.zip",
-      "plugin.video.f4mTester-4.0.8a.zip",
-      "plugin.video.f4mTester-4.1.0w.zip",
-      "plugin.video.fantasticc-2.4.1.zip",
-      "plugin.video.hdtrailers_net-2.0.1.zip",
-      "plugin.video.hdtrailers_net.reloaded-1.0.1.zip",
-      "plugin.video.liveTv.zip",
-      "plugin.video.macvod-1.96.zip",
-      "plugin.video.macvod-1.96e.zip",
-      "plugin.video.macvod-1.98.zip",
-      "plugin.video.macvod-1.991.zip",
-      "plugin.video.macvod-1.993.zip",
-      "plugin.video.macvod-1.995.zip",
-      "plugin.video.megakino-2.0.3.zip",
-      "plugin.video.next-2024.zip",
-      "plugin.video.now_music-5.6.8.zip",
-      "plugin.video.now_music-9.0.1.zip",
-      "plugin.video.playlistloader-1.0.3g+matrix.zip",
-      "plugin.video.playlistloader-1.1.4.zip",
-      "plugin.video.playlistloader-1.1.6.zip",
-      "plugin.video.playlistloader-1.1.7.zip",
-      "plugin.video.playlistloader-1.1.8.zip",
-      "plugin.video.sportliveevents-1.12a.zip",
-      "plugin.video.sportscentral-0.1.5.zip",
-      "plugin.video.sportstreams-1.1.4.zip",
-      "plugin.video.sr-regio-5.0.0.zip",
-      "plugin.video.stalker-2.2.0a.zip",
-      "plugin.video.stalker-2.2.0b.zip",
-      "plugin.video.stalker-2.2.0ba.zip",
-      "plugin.video.stalker-2.2.0c.zip",
-      "plugin.video.stalkermod-1.0.1.zip",
-      "plugin.video.stalkervod-0.0.7.zip",
-      "plugin.video.stbplus-2026.02.19.zip",
-      "plugin.video.tvlive-3.1.2.zip",
-      "plugin.video.tvone-26+matrix.1w.zip",
-      "plugin.video.tvone-26+matrix.2w.zip",
-      "plugin.video.tvone-27+matrix.1w.zip",
-      "plugin.video.tvone-27+matrix.2w.zip",
-      "plugin.video.tvone11-28+matrix.1w.zip",
-      "plugin.video.tvone111-24+matrix.1wa.zip",
-      "plugin.video.tvone111-25+matrix.1.zip",
-      "plugin.video.tvone111-25+matrix.1w.zip",
-      "plugin.video.tvone111-26+matrix.1w.zip",
-      "plugin.video.tvone1111-111+matrix.1w.zip",
-      "plugin.video.tvone1111-112+matrix.1w.zip",
-      "plugin.video.tvone1112-111+matrix.1.zip",
-      "plugin.video.tvone1112-112+matrix.1w.zip",
-      "plugin.video.tvone112-1+matrix.1w.zip",
-      "plugin.video.tvone112-2+matrix.1w.zip",
-      "plugin.video.tvone112-3+matrix.1w.zip",
-      "plugin.video.vav-3.1.zip",
-      "plugin.video.vavooto-2026.03.02.zip",
-      "plugin.video.vtv.live-1.2.1.zip",
-      "plugin.video.xship-2026.03.01.zip",
-      "repository.flowfavmanager-1.0.0.zip",
-      "repository.jurialmunkey.zip",
-      "repository.kodi.media-1.0.0.zip",
-      "repository.michaz-5.0.zip",
-      "repository.seizu-1.7.12.zip",
-      "script.favourites-8.1.2.zip",
-      "script.module.addon.common-2.0.0.zip",
-      "script.module.beautifulsoup-3.2.1.zip",
-      "script.module.cloudscraper-1.2.66.zip",
-      "script.module.futures-2.2.0.zip",
-      "script.module.liveresolver-0.1.50.zip",
-      "script.module.metahandler-3.0.2.zip",
-      "script.module.parsedom-2.5.2.zip",
-      "script.module.resolveurl.xxx-2.1.31.zip",
-      "script.module.routing-0.2.3.1.zip",
-      "script.module.singledispatch-3.4.0.3.zip",
-      "script.module.slproxy-1.0.0.zip",
-      "script.module.t0mm0.common-2.1.1.zip",
-      "script.module.t0mm0.common-3.0.1.zip",
-      "script.module.thetvdb.helper.zip",
-      "script.module.tzlocal-5.0.1.zip",
-      "script.module.websocket-0.58.0+matrix.2.zip",
-      "script.sites-19.5e.zip",
-      "script.video.F4mProxy-4.0.9a.zip",
-      "script.video.F4mProxy-4.0.9b.zip",
-      "service.autoexec-1.0.0.zip",
-      "service.autohideosd-1.0.0.zip",
-      "service.subtitles.all_subs_plus-2.3.1.zip"
+    // Gruppierung nach Typ
+    const addonGroups = {
+      "Video Addons": [
+        "plugin.video.cb20-2.2.5.zip",
+        "plugin.video.chaturbate-2.4.5.zip",
+        "plugin.video.duffyou-0.2.1.zip",
+        "plugin.video.empflix-2.1.1.zip",
+        "plugin.video.f4mTester-4.0.8a.zip",
+        "plugin.video.f4mTester-4.1.0w.zip",
+        "plugin.video.fantasticc-2.4.1.zip",
+        "plugin.video.hdtrailers_net-2.0.1.zip",
+        "plugin.video.hdtrailers_net.reloaded-1.0.1.zip",
+        "plugin.video.macvod-1.96.zip",
+        "plugin.video.macvod-1.96e.zip",
+        "plugin.video.macvod-1.98.zip",
+        "plugin.video.macvod-1.991.zip",
+        "plugin.video.macvod-1.993.zip",
+        "plugin.video.macvod-1.995.zip",
+        "plugin.video.megakino-2.0.3.zip",
+        "plugin.video.MetalOnMetal-1.0.14.zip",
+        "plugin.video.MusicHall-1.0.20.zip",
+        "plugin.video.next-2024.zip",
+        "plugin.video.now_music-5.6.8.zip",
+        "plugin.video.now_music-9.0.1.zip",
+        "plugin.video.playlistloader-1.0.3g+matrix.zip",
+        "plugin.video.playlistloader-1.1.4.zip",
+        "plugin.video.playlistloader-1.1.6.zip",
+        "plugin.video.playlistloader-1.1.7.zip",
+        "plugin.video.playlistloader-1.1.8.zip",
+        "plugin.video.sportliveevents-1.12a.zip",
+        "plugin.video.sportscentral-0.1.5.zip",
+        "plugin.video.sportstreams-1.1.4.zip",
+        "plugin.video.sr-regio-5.0.0.zip",
+        "plugin.video.stalker-2.2.0a.zip",
+        "plugin.video.stalker-2.2.0b.zip",
+        "plugin.video.stalker-2.2.0ba.zip",
+        "plugin.video.stalker-2.2.0c.zip",
+        "plugin.video.stalkermod-1.0.1.zip",
+        "plugin.video.stalkervod-0.0.7.zip",
+        "plugin.video.stbplus-2026.02.19.zip",
+        "plugin.video.tvlive-3.1.2.zip",
+        "plugin.video.tvone-26+matrix.1w.zip",
+        "plugin.video.tvone-26+matrix.2w.zip",
+        "plugin.video.tvone-27+matrix.1w.zip",
+        "plugin.video.tvone-27+matrix.2w.zip",
+        "plugin.video.tvone11-28+matrix.1w.zip",
+        "plugin.video.tvone111-24+matrix.1wa.zip",
+        "plugin.video.tvone111-25+matrix.1.zip",
+        "plugin.video.tvone111-25+matrix.1w.zip",
+        "plugin.video.tvone111-26+matrix.1w.zip",
+        "plugin.video.tvone1111-111+matrix.1w.zip",
+        "plugin.video.tvone1111-112+matrix.1w.zip",
+        "plugin.video.tvone1112-111+matrix.1.zip",
+        "plugin.video.tvone1112-112+matrix.1w.zip",
+        "plugin.video.tvone112-1+matrix.1w.zip",
+        "plugin.video.tvone112-2+matrix.1w.zip",
+        "plugin.video.tvone112-3+matrix.1w.zip",
+        "plugin.video.vav-3.1.zip",
+        "plugin.video.vavooto-2026.03.02.zip",
+        "plugin.video.vtv.live-1.2.1.zip",
+        "plugin.video.xship-2026.03.01.zip"
+      ],
+      "Audio Addons": [
+        "plugin.audio.mixcloud-420.3.0.2.zip",
+        "plugin.audio.mixcloud-420.3.0.4.zip",
+        "plugin.audio.mp3streams-2025.0.1.zip",
+        "plugin.audio.radio_de_light-1.0.2.zip"
+      ],
+      "Programme": [
+        "plugin.close.kodi-3.1.3.zip",
+        "plugin.close.kodi-3.1.4.zip",
+        "plugin.program.autoenabler-1.0.0.zip",
+        "plugin.program.autoenabler-1.0.1.zip",
+        "plugin.program.browser.launcher-2.0.0-Mod Kodi-19.zip",
+        "plugin.program.flowfavmanager-1.0.1.zip",
+        "plugin.program.orderfavourites-1.2.2a.zip",
+        "plugin.program.orderfavourites-1.2.3a.zip",
+        "plugin.program.simple.favourites-0.1.27d.zip",
+        "plugin.program.super.favourites-8888.w.zip"
+      ],
+      "Module": [
+        "script.module.addon.common-2.0.0.zip",
+        "script.module.beautifulsoup-3.2.1.zip",
+        "script.module.cloudscraper-1.2.66.zip",
+        "script.module.futures-2.2.0.zip",
+        "script.module.liveresolver-0.1.50.zip",
+        "script.module.metahandler-3.0.2.zip",
+        "script.module.parsedom-2.5.2.zip",
+        "script.module.resolveurl.xxx-2.1.31.zip",
+        "script.module.routing-0.2.3.1.zip",
+        "script.module.singledispatch-3.4.0.3.zip",
+        "script.module.slproxy-1.0.0.zip",
+        "script.module.t0mm0.common-2.1.1.zip",
+        "script.module.t0mm0.common-3.0.1.zip",
+        "script.module.thetvdb.helper.zip",
+        "script.module.tzlocal-5.0.1.zip",
+        "script.module.websocket-0.58.0+matrix.2.zip"
+      ],
+      "Repositories": [
+        "repository.flowfavmanager-1.0.0.zip",
+        "repository.jurialmunkey.zip",
+        "repository.kodi.media-1.0.0.zip",
+        "repository.michaz-5.0.zip",
+        "repository.seizu-1.7.12.zip"
+      ],
+      "Skripte": [
+        "script.favourites-8.1.2.zip",
+        "script.sites-19.5e.zip",
+        "script.video.F4mProxy-4.0.9a.zip",
+        "script.video.F4mProxy-4.0.9b.zip"
+      ],
+      "Services": [
+        "service.autoexec-1.0.0.zip",
+        "service.autohideosd-1.0.0.zip",
+        "service.subtitles.all_subs_plus-2.3.1.zip"
+      ],
+      "Sonstiges": [
+        "plugin.image.pdfreader-2.0.3.zip",
+        "plugin.video.liveTv.zip"
+      ]
+    };
+    const groupOrder = [
+      "Video Addons",
+      "Audio Addons",
+      "Programme",
+      "Module",
+      "Repositories",
+      "Skripte",
+      "Services",
+      "Sonstiges"
     ];
-    const list = document.getElementById('addonList');
-      addonZips.forEach(zip => {
-        const li = document.createElement('li');
-        const name = zip.replace(/-([\d\w.+]+)\.zip$/, '');
-        const url = `https://github.com/deranderechris/vmod.open.repo/raw/main/${encodeURIComponent(zip)}`;
-        li.innerHTML = `<span class=\"addon-icon\"></span><a href=\"${url}\" download>${name}</a>`;
-        list.appendChild(li);
-      });
+    const groupContainer = document.getElementById('addonGroups');
+    const makeAddonUrl = zip => `https://github.com/deranderechris/vmod.open.repo/raw/main/${encodeURIComponent(zip)}`;
+      // Hilfsfunktion: Addons nach Name gruppieren, Versionen als Array
+      function groupAddonsByName(zips) {
+        const map = {};
+        zips.forEach(zip => {
+          // Name = alles vor dem letzten -version.zip
+          const match = zip.match(/^(.*?)-([\d\w.+]+)\.zip$/);
+          if (!match) return;
+          const name = match[1];
+          if (!map[name]) map[name] = [];
+          map[name].push(zip);
+        });
+        // Versionen sortieren (neueste zuerst, grob nach String)
+        Object.keys(map).forEach(name => {
+          map[name].sort((a, b) => b.localeCompare(a));
+        });
+        return map;
+      }
+    groupOrder.forEach(group => {
+      if (!addonGroups[group] || addonGroups[group].length === 0) return;
+      const div = document.createElement('div');
+      div.className = 'addon-group';
+      div.innerHTML = `<h3>${group}</h3>`;
+        const addonsByName = groupAddonsByName(addonGroups[group]);
+        Object.keys(addonsByName).forEach(addonName => {
+          const tile = document.createElement('div');
+          tile.className = 'addon-tile';
+          tile.innerHTML = `<span class="addon-icon"></span><span class="addon-name">${addonName}</span>`;
+          // Accordion-Container für Versionen
+          const versionsDiv = document.createElement('div');
+          versionsDiv.className = 'addon-versions';
+          addonsByName[addonName].forEach(zip => {
+            const url = makeAddonUrl(zip);
+            const version = zip.match(/-([\d\w.+]+)\.zip$/)?.[1] || zip;
+            const a = document.createElement('a');
+            a.className = 'addon-version-link';
+            a.href = url;
+            a.download = '';
+            a.textContent = `Version ${version}`;
+            versionsDiv.appendChild(a);
+          });
+          tile.appendChild(versionsDiv);
+          tile.addEventListener('click', function(e) {
+            // Accordion: Nur ein Tile pro Gruppe offen
+            const all = div.querySelectorAll('.addon-versions');
+            all.forEach(v => { if (v !== versionsDiv) v.classList.remove('active'); });
+            versionsDiv.classList.toggle('active');
+            e.stopPropagation();
+          });
+          div.appendChild(tile);
+        });
+      groupContainer.appendChild(div);
+    });
   </script>
 </body>
 </html>
