@@ -5,6 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kodi Repo Übersicht</title>
   <style>
+        .addon-tile {
+          background: #181f1b;
+          border-radius: 10px;
+          margin-bottom: 1.1rem;
+          box-shadow: 0 0 12px #00ff9022;
+          padding: 0.7rem 1rem;
+          transition: box-shadow 0.2s, background 0.2s;
+          border: 1px solid #00ff9033;
+          cursor: pointer;
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 0.7rem;
+        }
+        .addon-tile:hover {
+          background: #1a2d22;
+          box-shadow: 0 0 24px #00ff90cc;
+        }
+        .addon-tile .addon-icon {
+          width: 28px;
+          height: 28px;
+          background: linear-gradient(135deg, #00ff90 60%, #00ffea 100%);
+          border-radius: 8px;
+          display: inline-block;
+          margin-right: 0.7rem;
+          box-shadow: 0 0 12px #00ff90cc;
+          flex-shrink: 0;
+        }
+        .addon-tile .addon-name {
+          font-size: 1.1rem;
+          color: #00ffea;
+          font-weight: bold;
+          letter-spacing: 1px;
+          text-shadow: 0 0 6px #00ff90cc;
+        }
+        .addon-versions {
+          display: none;
+          flex-direction: column;
+          margin-top: 0.5rem;
+          margin-left: 2.5rem;
+          gap: 0.3rem;
+          animation: fadeIn 0.3s;
+        }
+        .addon-versions.active {
+          display: flex;
+        }
+        .addon-version-link {
+          color: #00ffaa;
+          background: #101a13;
+          border-radius: 6px;
+          padding: 0.2rem 0.7rem;
+          font-size: 0.98rem;
+          margin-bottom: 0.1rem;
+          text-decoration: none;
+          box-shadow: 0 0 6px #00ff9022;
+          transition: background 0.2s, color 0.2s;
+          border: 1px solid #00ff9033;
+          display: inline-block;
+        }
+        .addon-version-link:hover {
+          background: #00ff90;
+          color: #101010;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
     body {
       background: #101010;
       color: #00ff90;
