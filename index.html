@@ -1,9 +1,4 @@
-    .addon-group-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem 1.2rem;
-      margin-top: 1.2rem;
-    }
+    
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -29,7 +24,6 @@
               z-index: 1;
               border-radius: 2px;
               pointer-events: none;
-            <style>
               html, body {
                 background: #181a1b;
                 color: #e0e0e0;
@@ -188,7 +182,6 @@
                 color: #e0e0e0;
               }
             </style>
-            </style>
         "plugin.video.tvone112-3+matrix.1w.zip",
         "plugin.video.vav-3.1.zip",
         "plugin.video.vavooto-2026.03.02.zip",
@@ -280,6 +273,7 @@
         arr.sort((a, b) => a.name.localeCompare(b.name) || b.version.localeCompare(a.version));
         return arr;
       }
+
       groupOrder.forEach(group => {
         if (!addonGroups[group] || addonGroups[group].length === 0) return;
         const div = document.createElement('div');
@@ -304,6 +298,6 @@
         div.appendChild(content);
         groupContainer.appendChild(div);
       });
-  </script>
+      </script>
 </body>
 </html>
