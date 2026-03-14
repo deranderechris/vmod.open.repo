@@ -23,163 +23,186 @@
               z-index: 1;
               border-radius: 2px;
               pointer-events: none;
-            }
-            /* Abstand zwischen Addon-Kacheln */
-            .addon-group {
-              display: flex;
-              flex-direction: column;
-              gap: 1mm;
-              position: relative;
-              z-index: 2;
-              max-width: 520px;
-              width: 100%;
-              margin: 0 auto;
-            }
-            .addon-group h3 {
-              color: #39ff14;
-              text-shadow: 0 0 12px #39ff14, 0 0 24px #00ff90cc;
-            }
-        .addon-tile {
-          background: #181f1b;
-          border-radius: 10px;
-          margin-bottom: 1.1rem;
-          box-shadow: 0 0 16px #00ff90cc, 0 0 32px #00ff9022;
-          padding: 0.7rem 1rem;
-          transition: box-shadow 0.2s, background 0.2s;
-          border: 1px solid #00ff9033;
-          cursor: pointer;
-          position: relative;
-          display: flex;
-          align-items: center;
-          gap: 0.7rem;
-        }
-        .addon-tile:hover {
-          background: #1a2d22;
-          box-shadow: 0 0 32px #00ff90, 0 0 48px #00ff90cc;
-        }
-        .addon-tile .addon-icon {
-          width: 28px;
-          height: 28px;
-          background: linear-gradient(135deg, #00ff90 60%, #00ffea 100%);
-          border-radius: 8px;
-          display: inline-block;
-          margin-right: 0.7rem;
-          box-shadow: 0 0 12px #00ff90cc;
-          flex-shrink: 0;
-        }
-        .addon-tile .addon-name {
-          font-size: 1.1rem;
-          color: #00ffea;
-          font-weight: bold;
-          letter-spacing: 1px;
-          text-shadow: 0 0 6px #00ff90cc;
-        }
-        .addon-versions {
-          display: none;
-          flex-direction: column;
-          margin-top: 0.5rem;
-          margin-left: 2.5rem;
-          gap: 0.3rem;
-          animation: fadeIn 0.3s;
-        }
-        .addon-versions.active {
-          display: flex;
-        }
-        .addon-version-link {
-          color: #00ffaa;
-          background: #101a13;
-          border-radius: 6px;
-          padding: 0.2rem 0.7rem;
-          font-size: 0.98rem;
-          margin-bottom: 0.1rem;
-          text-decoration: none;
-          box-shadow: 0 0 12px #00ff90cc, 0 0 24px #00ff9022;
-          transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-          border: 1px solid #00ff9033;
-          display: inline-block;
-        }
-        .addon-version-link:hover {
-          background: #00ff90;
-          color: #101010;
-          box-shadow: 0 0 32px #00ff90, 0 0 48px #00ff90cc;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-  </style>
-  <link href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700&display=swap" rel="stylesheet">
-</head>
-<body>
-  <header>
-    <h1>Kodi Repo Übersicht</h1>
-    <p>Inoffizielle Repo Team VMod</p>
-      <a href="https://github.com/deranderechris/vmod.open.repo/releases/download/v1.0/repo-vmod.zip" style="display:inline-block;margin:1.5rem auto 0 auto;padding:0.7rem 1.5rem;background:#00ff90;color:#101010;font-weight:bold;border-radius:6px;text-decoration:none;box-shadow:0 0 8px #00ff90cc;transition:background 0.2s;">&#128229; Repo als ZIP herunterladen</a>
-  </header>
-  <section class="addon-list" id="addonGroups">
-    <!-- Addon-Gruppen werden per JS eingefügt -->
-  </section>
-  <div class="footer">
-    &copy; 2026 vmod.open.repo &ndash; <a href="https://github.com/deranderechris/vmod.open.repo">GitHub</a>
-  </div>
-  <script>
-    // Addon-Name zu ZIP-Datei Mapping (aus dem Verzeichnis, automatisch generiert)
-    // Gruppierung nach Typ
-    const addonGroups = {
-      "Video Addons": [
-        "plugin.video.cb20-2.2.5.zip",
-        "plugin.video.chaturbate-2.4.5.zip",
-        "plugin.video.duffyou-0.2.1.zip",
-        "plugin.video.empflix-2.1.1.zip",
-        "plugin.video.f4mTester-4.0.8a.zip",
-        "plugin.video.f4mTester-4.1.0w.zip",
-        "plugin.video.fantasticc-2.4.1.zip",
-        "plugin.video.hdtrailers_net-2.0.1.zip",
-        "plugin.video.hdtrailers_net.reloaded-1.0.1.zip",
-        "plugin.video.macvod-1.96.zip",
-        "plugin.video.macvod-1.96e.zip",
-        "plugin.video.macvod-1.98.zip",
-        "plugin.video.macvod-1.991.zip",
-        "plugin.video.macvod-1.993.zip",
-        "plugin.video.macvod-1.995.zip",
-        "plugin.video.megakino-2.0.3.zip",
-        "plugin.video.MetalOnMetal-1.0.14.zip",
-        "plugin.video.MusicHall-1.0.20.zip",
-        "plugin.video.next-2024.zip",
-        "plugin.video.now_music-5.6.8.zip",
-        "plugin.video.now_music-9.0.1.zip",
-        "plugin.video.playlistloader-1.0.3g+matrix.zip",
-        "plugin.video.playlistloader-1.1.4.zip",
-        "plugin.video.playlistloader-1.1.6.zip",
-        "plugin.video.playlistloader-1.1.7.zip",
-        "plugin.video.playlistloader-1.1.8.zip",
-        "plugin.video.sportliveevents-1.12a.zip",
-        "plugin.video.sportscentral-0.1.5.zip",
-        "plugin.video.sportstreams-1.1.4.zip",
-        "plugin.video.sr-regio-5.0.0.zip",
-        "plugin.video.stalker-2.2.0a.zip",
-        "plugin.video.stalker-2.2.0b.zip",
-        "plugin.video.stalker-2.2.0ba.zip",
-        "plugin.video.stalker-2.2.0c.zip",
-        "plugin.video.stalkermod-1.0.1.zip",
-        "plugin.video.stalkervod-0.0.7.zip",
-        "plugin.video.stbplus-2026.02.19.zip",
-        "plugin.video.tvlive-3.1.2.zip",
-        "plugin.video.tvone-26+matrix.1w.zip",
-        "plugin.video.tvone-26+matrix.2w.zip",
-        "plugin.video.tvone-27+matrix.1w.zip",
-        "plugin.video.tvone-27+matrix.2w.zip",
-        "plugin.video.tvone11-28+matrix.1w.zip",
-        "plugin.video.tvone111-24+matrix.1wa.zip",
-        "plugin.video.tvone111-25+matrix.1.zip",
-        "plugin.video.tvone111-25+matrix.1w.zip",
-        "plugin.video.tvone111-26+matrix.1w.zip",
-        "plugin.video.tvone1111-111+matrix.1w.zip",
-        "plugin.video.tvone1111-112+matrix.1w.zip",
-        "plugin.video.tvone1112-111+matrix.1.zip",
-        "plugin.video.tvone1112-112+matrix.1w.zip",
-        "plugin.video.tvone112-1+matrix.1w.zip",
-        "plugin.video.tvone112-2+matrix.1w.zip",
+            <style>
+              html, body {
+                background: #070b0c;
+                color: #00ff90;
+                font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+                letter-spacing: 0.5px;
+              }
+              header {
+                background: #0a0f11;
+                padding: 2.5rem 1rem 1.5rem 1rem;
+                text-align: center;
+                border-bottom: 2px solid #00ff90;
+                box-shadow: 0 2px 24px #00ff9033, 0 0 80px #00ff90cc inset;
+              }
+              h1 {
+                margin: 0;
+                font-size: 2.7rem;
+                letter-spacing: 3px;
+                color: #00ff90;
+                text-shadow: 0 0 24px #00ff90, 0 0 8px #00ff90cc, 0 0 2px #00ff90;
+                font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+                font-weight: 700;
+                text-transform: uppercase;
+              }
+              .addon-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+                gap: 2.5rem 2.5rem;
+                max-width: 1300px;
+                margin: 2.5rem auto;
+                background: #0a0f11;
+                border-radius: 22px;
+                box-shadow: 0 0 64px #00ff90cc, 0 0 120px #00ff9022 inset;
+                padding: 3rem 2.5rem;
+                border: 2.5px solid #00ff90;
+                position: relative;
+                overflow: visible;
+              }
+              .addon-list::before {
+                content: "";
+                position: absolute;
+                top: 2.5rem;
+                bottom: 2.5rem;
+                left: 50%;
+                width: 2.5px;
+                background: linear-gradient(to bottom, #00ff90cc 10%, #070b0c00 90%);
+                z-index: 1;
+                border-radius: 2px;
+                pointer-events: none;
+                filter: blur(0.5px);
+              }
+              .addon-group {
+                background: linear-gradient(135deg, #0a0f11 80%, #00ff9022 100%);
+                border-radius: 18px;
+                padding: 1.7rem 1.3rem 1.3rem 1.3rem;
+                border: 2px solid #00ff90cc;
+                box-shadow: 0 0 32px #00ff90cc, 0 0 64px #00ff9022 inset, 0 0 32px #00ff90 inset;
+                display: flex;
+                flex-direction: column;
+                gap: 1.2rem;
+                position: relative;
+                z-index: 2;
+                max-width: 540px;
+                width: 100%;
+                margin: 0 auto;
+                transition: box-shadow 0.2s, border 0.2s;
+              }
+              .addon-group:hover {
+                box-shadow: 0 0 64px #00ff90, 0 0 120px #00ff90cc, 0 0 32px #00ff90 inset;
+                border: 2.5px solid #39ff14;
+              }
+              .addon-group h3 {
+                color: #39ff14;
+                text-shadow: 0 0 32px #39ff14, 0 0 24px #00ff90cc, 0 0 2px #00ff90;
+                margin-top: 0;
+                font-size: 1.4rem;
+                border-bottom: 2px solid #00ff90;
+                padding-bottom: 0.5rem;
+                margin-bottom: 1.2rem;
+                letter-spacing: 2px;
+                cursor: pointer;
+                user-select: none;
+                font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+                font-weight: 700;
+                text-transform: uppercase;
+              }
+              .addon-tile {
+                background: #0e1813;
+                border-radius: 12px;
+                margin-bottom: 1.2rem;
+                box-shadow: 0 0 32px #00ff90cc, 0 0 64px #00ff9022;
+                padding: 0.9rem 1.2rem;
+                transition: box-shadow 0.2s, background 0.2s, border 0.2s;
+                border: 1.5px solid #00ff9033;
+                cursor: pointer;
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 0.9rem;
+                overflow: visible;
+              }
+              .addon-tile:hover {
+                background: #101f1b;
+                box-shadow: 0 0 48px #00ff90, 0 0 96px #00ff90cc;
+                border: 2px solid #39ff14;
+              }
+              .addon-tile .addon-icon {
+                width: 32px;
+                height: 32px;
+                background: linear-gradient(135deg, #00ff90 60%, #39ff14 100%);
+                border-radius: 10px;
+                display: inline-block;
+                margin-right: 0.9rem;
+                box-shadow: 0 0 18px #00ff90cc, 0 0 32px #39ff14;
+                flex-shrink: 0;
+                border: 1.5px solid #00ff90cc;
+              }
+              .addon-tile .addon-name {
+                font-size: 1.15rem;
+                color: #00ffea;
+                font-weight: bold;
+                letter-spacing: 1.5px;
+                text-shadow: 0 0 12px #00ff90cc, 0 0 2px #00ff90;
+                font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+              }
+              .addon-versions {
+                display: none;
+                flex-direction: column;
+                margin-top: 0.6rem;
+                margin-left: 2.7rem;
+                gap: 0.4rem;
+                animation: fadeIn 0.3s;
+              }
+              .addon-versions.active {
+                display: flex;
+              }
+              .addon-version-link {
+                color: #00ffaa;
+                background: #070b0c;
+                border-radius: 7px;
+                padding: 0.25rem 0.9rem;
+                font-size: 1.01rem;
+                margin-bottom: 0.1rem;
+                text-decoration: none;
+                box-shadow: 0 0 18px #00ff90cc, 0 0 32px #00ff9022;
+                transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s;
+                border: 1.5px solid #00ff9033;
+                display: inline-block;
+                font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+              }
+              .addon-version-link:hover {
+                background: #00ff90;
+                color: #101010;
+                box-shadow: 0 0 32px #00ff90, 0 0 48px #00ff90cc;
+                border: 2px solid #39ff14;
+              }
+              @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+              }
+              .footer {
+                text-align: center;
+                color: #00ff90aa;
+                font-size: 0.95rem;
+                margin: 2.5rem 0 1.5rem 0;
+                letter-spacing: 1px;
+              }
+              a {
+                color: #00ff90;
+                text-decoration: underline;
+                transition: color 0.2s;
+              }
+              a:hover {
+                color: #39ff14;
+                text-shadow: 0 0 8px #00ff90cc;
+              }
+            </style>
         "plugin.video.tvone112-3+matrix.1w.zip",
         "plugin.video.vav-3.1.zip",
         "plugin.video.vavooto-2026.03.02.zip",
