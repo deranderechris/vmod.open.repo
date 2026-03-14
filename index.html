@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kodi Repo Übersicht</title>
   <style>
+            /* Vertikaler Trennstrich zwischen den Gruppen */
+            .addon-list {
+              position: relative;
+            }
+            .addon-list::before {
+              content: "";
+              position: absolute;
+              top: 2rem;
+              bottom: 2rem;
+              left: 50%;
+              width: 2px;
+              background: linear-gradient(to bottom, #00ff90cc 10%, #10101000 90%);
+              z-index: 1;
+              border-radius: 2px;
+              pointer-events: none;
+            }
+            /* Abstand zwischen Addon-Kacheln */
+            .addon-group {
+              display: flex;
+              flex-direction: column;
+              gap: 1mm;
+              position: relative;
+              z-index: 2;
+            }
         .addon-tile {
           background: #181f1b;
           border-radius: 10px;
