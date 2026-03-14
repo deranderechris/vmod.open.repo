@@ -28,33 +28,20 @@
       text-shadow: 0 0 8px #00ff90cc;
     }
     .addon-list {
-      max-width: 900px;
+      max-width: 1200px;
       margin: 2rem auto;
       background: #181818;
-      border-radius: 10px;
-      box-shadow: 0 0 16px #00ff9022;
-      padding: 2rem;
-      border: 1px solid #00ff90;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      justify-content: space-between;
+      border-radius: 18px;
+      box-shadow: 0 0 32px #00ff90aa, 0 0 80px #00ff9022 inset;
+      padding: 2.5rem 2rem;
+      border: 2px solid #00ff90;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem 2rem;
     }
     .addon-group {
       flex: 1 1 350px;
       min-width: 320px;
-        .addon-list {
-          max-width: 1200px;
-          margin: 2rem auto;
-          background: #181818;
-          border-radius: 18px;
-          box-shadow: 0 0 32px #00ff90aa, 0 0 80px #00ff9022 inset;
-          padding: 2.5rem 2rem;
-          border: 2px solid #00ff90;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2.5rem 2rem;
-        }
       margin-bottom: 0.7rem;
       letter-spacing: 1px;
     }
