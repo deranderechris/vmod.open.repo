@@ -109,9 +109,8 @@
     <p>Inoffizielle Repo Team VMod</p>
       <a href="https://github.com/deranderechris/vmod.open.repo/releases/download/v1.0/repo-vmod.zip" style="display:inline-block;margin:1.5rem auto 0 auto;padding:0.7rem 1.5rem;background:#00ff90;color:#101010;font-weight:bold;border-radius:6px;text-decoration:none;box-shadow:0 0 8px #00ff90cc;transition:background 0.2s;">&#128229; Repo als ZIP herunterladen</a>
   </header>
-  <section class="addon-list">
+  <section class="addon-list" id="addonGroups">
     <!-- Addon-Gruppen werden per JS eingefügt -->
-    <div id="addonGroups"></div>
   </section>
   <div class="footer">
     &copy; 2026 vmod.open.repo &ndash; <a href="https://github.com/deranderechris/vmod.open.repo">GitHub</a>
@@ -273,34 +272,34 @@
       const div = document.createElement('div');
       div.className = 'addon-group';
       div.innerHTML = `<h3>${group}</h3>`;
-        const addonsByName = groupAddonsByName(addonGroups[group]);
-        Object.keys(addonsByName).forEach(addonName => {
-          const tile = document.createElement('div');
-          tile.className = 'addon-tile';
-          tile.innerHTML = `<span class="addon-icon"></span><span class="addon-name">${addonName}</span>`;
-          // Accordion-Container für Versionen
-          const versionsDiv = document.createElement('div');
-          versionsDiv.className = 'addon-versions';
-          addonsByName[addonName].forEach(zip => {
-            const url = makeAddonUrl(zip);
-            const version = zip.match(/-([\d\w.+]+)\.zip$/)?.[1] || zip;
-            const a = document.createElement('a');
-            a.className = 'addon-version-link';
-            a.href = url;
-            a.download = '';
-            a.textContent = `Version ${version}`;
-            versionsDiv.appendChild(a);
-          });
-          tile.appendChild(versionsDiv);
-          tile.addEventListener('click', function(e) {
-            // Accordion: Nur ein Tile pro Gruppe offen
-            const all = div.querySelectorAll('.addon-versions');
-            all.forEach(v => { if (v !== versionsDiv) v.classList.remove('active'); });
-            versionsDiv.classList.toggle('active');
-            e.stopPropagation();
-          });
-          div.appendChild(tile);
+      const addonsByName = groupAddonsByName(addonGroups[group]);
+      Object.keys(addonsByName).forEach(addonName => {
+        const tile = document.createElement('div');
+        tile.className = 'addon-tile';
+        tile.innerHTML = `<span class="addon-icon"></span><span class="addon-name">${addonName}</span>`;
+        // Accordion-Container für Versionen
+        const versionsDiv = document.createElement('div');
+        versionsDiv.className = 'addon-versions';
+        addonsByName[addonName].forEach(zip => {
+          const url = makeAddonUrl(zip);
+          const version = zip.match(/-([\d\w.+]+)\.zip$/)?.[1] || zip;
+          const a = document.createElement('a');
+          a.className = 'addon-version-link';
+          a.href = url;
+          a.download = '';
+          a.textContent = `Version ${version}`;
+          versionsDiv.appendChild(a);
         });
+        tile.appendChild(versionsDiv);
+        tile.addEventListener('click', function(e) {
+          // Accordion: Nur ein Tile pro Gruppe offen
+          const all = div.querySelectorAll('.addon-versions');
+          all.forEach(v => { if (v !== versionsDiv) v.classList.remove('active'); });
+          versionsDiv.classList.toggle('active');
+          e.stopPropagation();
+        });
+        div.appendChild(tile);
+      });
       groupContainer.appendChild(div);
     });
   </script>
