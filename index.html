@@ -25,27 +25,26 @@
               pointer-events: none;
             <style>
               html, body {
-                background: #070b0c;
-                color: #00ff90;
+                background: #181a1b;
+                color: #e0e0e0;
                 font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
                 margin: 0;
                 padding: 0;
                 min-height: 100vh;
-                letter-spacing: 0.5px;
+                letter-spacing: 0.2px;
               }
               header {
-                background: #0a0f11;
+                background: #1a1c1e;
                 padding: 2.5rem 1rem 1.5rem 1rem;
                 text-align: center;
-                border-bottom: 2px solid #00ff90;
-                box-shadow: 0 2px 24px #00ff9033, 0 0 80px #00ff90cc inset;
+                border-bottom: 1.5px solid #232728;
+                box-shadow: 0 2px 24px #23272833;
               }
               h1 {
                 margin: 0;
-                font-size: 2.7rem;
-                letter-spacing: 3px;
-                color: #00ff90;
-                text-shadow: 0 0 24px #00ff90, 0 0 8px #00ff90cc, 0 0 2px #00ff90;
+                font-size: 2.3rem;
+                letter-spacing: 2px;
+                color: #e0e0e0;
                 font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
                 font-weight: 700;
                 text-transform: uppercase;
@@ -53,59 +52,41 @@
               .addon-list {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
-                gap: 2.5rem 2.5rem;
-                max-width: 1300px;
+                gap: 2.2rem 2.2rem;
+                max-width: 1200px;
                 margin: 2.5rem auto;
-                background: #0a0f11;
-                border-radius: 22px;
-                box-shadow: 0 0 64px #00ff90cc, 0 0 120px #00ff9022 inset;
-                padding: 3rem 2.5rem;
-                border: 2.5px solid #00ff90;
+                background: #202224;
+                border-radius: 18px;
+                box-shadow: 0 0 32px #23272844, 0 0 80px #23272822 inset;
+                padding: 2.5rem 2rem;
+                border: 1.5px solid #232728;
                 position: relative;
                 overflow: visible;
               }
-              .addon-list::before {
-                content: "";
-                position: absolute;
-                top: 2.5rem;
-                bottom: 2.5rem;
-                left: 50%;
-                width: 2.5px;
-                background: linear-gradient(to bottom, #00ff90cc 10%, #070b0c00 90%);
-                z-index: 1;
-                border-radius: 2px;
-                pointer-events: none;
-                filter: blur(0.5px);
-              }
               .addon-group {
-                background: linear-gradient(135deg, #0a0f11 80%, #00ff9022 100%);
-                border-radius: 18px;
-                padding: 1.7rem 1.3rem 1.3rem 1.3rem;
-                border: 2px solid #00ff90cc;
-                box-shadow: 0 0 32px #00ff90cc, 0 0 64px #00ff9022 inset, 0 0 32px #00ff90 inset;
+                background: #232728;
+                border-radius: 14px;
+                padding: 1.5rem 1.1rem 1.1rem 1.1rem;
+                border: 1.5px solid #232728;
+                box-shadow: 0 0 16px #23272822, 0 0 32px #23272811 inset;
                 display: flex;
                 flex-direction: column;
-                gap: 1.2rem;
+                gap: 1.1rem;
                 position: relative;
                 z-index: 2;
-                max-width: 540px;
+                max-width: 520px;
                 width: 100%;
                 margin: 0 auto;
                 transition: box-shadow 0.2s, border 0.2s;
               }
-              .addon-group:hover {
-                box-shadow: 0 0 64px #00ff90, 0 0 120px #00ff90cc, 0 0 32px #00ff90 inset;
-                border: 2.5px solid #39ff14;
-              }
               .addon-group h3 {
-                color: #39ff14;
-                text-shadow: 0 0 32px #39ff14, 0 0 24px #00ff90cc, 0 0 2px #00ff90;
+                color: #b6ff00;
                 margin-top: 0;
-                font-size: 1.4rem;
-                border-bottom: 2px solid #00ff90;
-                padding-bottom: 0.5rem;
-                margin-bottom: 1.2rem;
-                letter-spacing: 2px;
+                font-size: 1.15rem;
+                border-bottom: 1px solid #353a3c;
+                padding-bottom: 0.4rem;
+                margin-bottom: 1.1rem;
+                letter-spacing: 1.2px;
                 cursor: pointer;
                 user-select: none;
                 font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
@@ -113,74 +94,73 @@
                 text-transform: uppercase;
               }
               .addon-tile {
-                background: #0e1813;
-                border-radius: 12px;
-                margin-bottom: 1.2rem;
-                box-shadow: 0 0 32px #00ff90cc, 0 0 64px #00ff9022;
-                padding: 0.9rem 1.2rem;
+                background: #232728;
+                border-radius: 8px;
+                margin-bottom: 1.1rem;
+                box-shadow: 0 0 8px #23272822;
+                padding: 0.7rem 1rem;
                 transition: box-shadow 0.2s, background 0.2s, border 0.2s;
-                border: 1.5px solid #00ff9033;
+                border: 1px solid #232728;
                 cursor: pointer;
                 position: relative;
                 display: flex;
                 align-items: center;
-                gap: 0.9rem;
+                gap: 0.7rem;
                 overflow: visible;
               }
               .addon-tile:hover {
-                background: #101f1b;
-                box-shadow: 0 0 48px #00ff90, 0 0 96px #00ff90cc;
-                border: 2px solid #39ff14;
+                background: #262a2c;
+                box-shadow: 0 0 16px #353a3c;
+                border: 1.5px solid #353a3c;
               }
               .addon-tile .addon-icon {
-                width: 32px;
-                height: 32px;
-                background: linear-gradient(135deg, #00ff90 60%, #39ff14 100%);
-                border-radius: 10px;
+                width: 24px;
+                height: 24px;
+                background: #353a3c;
+                border-radius: 6px;
                 display: inline-block;
-                margin-right: 0.9rem;
-                box-shadow: 0 0 18px #00ff90cc, 0 0 32px #39ff14;
+                margin-right: 0.7rem;
+                box-shadow: 0 0 8px #23272833;
                 flex-shrink: 0;
-                border: 1.5px solid #00ff90cc;
+                border: 1px solid #232728;
               }
               .addon-tile .addon-name {
-                font-size: 1.15rem;
-                color: #00ffea;
+                font-size: 1.05rem;
+                color: #e0e0e0;
                 font-weight: bold;
-                letter-spacing: 1.5px;
-                text-shadow: 0 0 12px #00ff90cc, 0 0 2px #00ff90;
+                letter-spacing: 1px;
                 font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
               }
               .addon-versions {
                 display: none;
                 flex-direction: column;
-                margin-top: 0.6rem;
-                margin-left: 2.7rem;
-                gap: 0.4rem;
+                margin-top: 0.5rem;
+                margin-left: 2.5rem;
+                gap: 0.3rem;
                 animation: fadeIn 0.3s;
               }
               .addon-versions.active {
                 display: flex;
               }
               .addon-version-link {
-                color: #00ffaa;
-                background: #070b0c;
-                border-radius: 7px;
-                padding: 0.25rem 0.9rem;
-                font-size: 1.01rem;
+                color: #b6ff00;
+                background: #181a1b;
+                border-radius: 5px;
+                padding: 0.18rem 0.7rem;
+                font-size: 0.98rem;
                 margin-bottom: 0.1rem;
                 text-decoration: none;
-                box-shadow: 0 0 18px #00ff90cc, 0 0 32px #00ff9022;
+                box-shadow: 0 0 4px #23272822;
                 transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s;
-                border: 1.5px solid #00ff9033;
+                border: 1px solid #232728;
                 display: inline-block;
                 font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
               }
               .addon-version-link:hover {
-                background: #00ff90;
-                color: #101010;
-                box-shadow: 0 0 32px #00ff90, 0 0 48px #00ff90cc;
-                border: 2px solid #39ff14;
+                background: #232728;
+                color: #e0e0e0;
+                box-shadow: 0 0 8px #353a3c;
+                border: 1.5px solid #353a3c;
               }
               @keyframes fadeIn {
                 from { opacity: 0; transform: translateY(-10px); }
@@ -188,20 +168,20 @@
               }
               .footer {
                 text-align: center;
-                color: #00ff90aa;
+                color: #888;
                 font-size: 0.95rem;
                 margin: 2.5rem 0 1.5rem 0;
                 letter-spacing: 1px;
               }
               a {
-                color: #00ff90;
+                color: #b6ff00;
                 text-decoration: underline;
                 transition: color 0.2s;
               }
               a:hover {
-                color: #39ff14;
-                text-shadow: 0 0 8px #00ff90cc;
+                color: #e0e0e0;
               }
+            </style>
             </style>
         "plugin.video.tvone112-3+matrix.1w.zip",
         "plugin.video.vav-3.1.zip",
@@ -280,58 +260,44 @@
     ];
     const groupContainer = document.getElementById('addonGroups');
     const makeAddonUrl = zip => `https://github.com/deranderechris/vmod.open.repo/raw/main/${encodeURIComponent(zip)}`;
-      // Hilfsfunktion: Addons nach Name gruppieren, Versionen als Array
-      function groupAddonsByName(zips) {
-        const map = {};
+      // Addons als Kacheln (jede Version einzeln) im Grid pro Gruppe
+      function groupAddonsByNameAndVersion(zips) {
+        const arr = [];
         zips.forEach(zip => {
-          // Name = alles vor dem letzten -version.zip
           const match = zip.match(/^(.*?)-([\d\w.+]+)\.zip$/);
           if (!match) return;
           const name = match[1];
-          if (!map[name]) map[name] = [];
-          map[name].push(zip);
+          const version = match[2];
+          arr.push({ name, version, zip });
         });
-        // Versionen sortieren (neueste zuerst, grob nach String)
-        Object.keys(map).forEach(name => {
-          map[name].sort((a, b) => b.localeCompare(a));
-        });
-        return map;
+        // Nach Name, dann Version sortieren
+        arr.sort((a, b) => a.name.localeCompare(b.name) || b.version.localeCompare(a.version));
+        return arr;
       }
-    groupOrder.forEach(group => {
-      if (!addonGroups[group] || addonGroups[group].length === 0) return;
-      const div = document.createElement('div');
-      div.className = 'addon-group';
-      div.innerHTML = `<h3>${group}</h3>`;
-      const addonsByName = groupAddonsByName(addonGroups[group]);
-      Object.keys(addonsByName).forEach(addonName => {
-        const tile = document.createElement('div');
-        tile.className = 'addon-tile';
-        tile.innerHTML = `<span class="addon-icon"></span><span class="addon-name">${addonName}</span>`;
-        // Accordion-Container für Versionen
-        const versionsDiv = document.createElement('div');
-        versionsDiv.className = 'addon-versions';
-        addonsByName[addonName].forEach(zip => {
+      groupOrder.forEach(group => {
+        if (!addonGroups[group] || addonGroups[group].length === 0) return;
+        const div = document.createElement('div');
+        div.className = 'addon-group';
+        div.innerHTML = `<h3>${group}</h3>`;
+        const content = document.createElement('div');
+        content.className = 'addon-group-content';
+        const addons = groupAddonsByNameAndVersion(addonGroups[group]);
+        addons.forEach(({ name, version, zip }) => {
+          const tile = document.createElement('div');
+          tile.className = 'addon-tile';
+          tile.innerHTML = `<span class="addon-icon"></span><span class="addon-name">${name} <span style='color:#888;font-size:0.95em;'>${version}</span></span>`;
           const url = makeAddonUrl(zip);
-          const version = zip.match(/-([\d\w.+]+)\.zip$/)?.[1] || zip;
           const a = document.createElement('a');
           a.className = 'addon-version-link';
           a.href = url;
           a.download = '';
-          a.textContent = `Version ${version}`;
-          versionsDiv.appendChild(a);
+          a.textContent = 'Download';
+          tile.appendChild(a);
+          content.appendChild(tile);
         });
-        tile.appendChild(versionsDiv);
-        tile.addEventListener('click', function(e) {
-          // Accordion: Nur ein Tile pro Gruppe offen
-          const all = div.querySelectorAll('.addon-versions');
-          all.forEach(v => { if (v !== versionsDiv) v.classList.remove('active'); });
-          versionsDiv.classList.toggle('active');
-          e.stopPropagation();
-        });
-        div.appendChild(tile);
+        div.appendChild(content);
+        groupContainer.appendChild(div);
       });
-      groupContainer.appendChild(div);
-    });
   </script>
 </body>
 </html>
