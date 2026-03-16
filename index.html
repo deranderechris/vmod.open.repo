@@ -1,174 +1,171 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>D.A. Offene Kodi Repo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>vmod.open.repo — Addons</title>
 <style>
-    body {
-        margin: 0;
-        background: #0d0d0d;
-        font-family: Arial, sans-serif;
-        color: #ffffff;
-    }
-    header {
-        padding: 20px;
-        text-align: center;
-        background: #111;
-        border-bottom: 2px solid #333;
-        font-size: 26px;
-        font-weight: bold;
-    }
-    .container {
-        padding: 20px;
-        max-width: 900px;
-        margin: auto;
-    }
-    select {
-        background: #1a1a1a;
-        color: #fff;
-        border: 1px solid #333;
-        padding: 8px;
-        margin-bottom: 20px;
-        width: 100%;
-        border-radius: 5px;
-    }
-    .addon {
-        background: #1a1a1a;
-        border: 1px solid #333;
-        border-radius: 6px;
-        padding: 15px;
-        margin-top: 12px;
-    }
-    .addon-title {
-        font-size: 18px;
-        font-weight: bold;
-        color: #fff;
-    }
-    .addon-category {
-        color: #888;
-        font-size: 14px;
-        margin-top: 4px;
-    }
-    .addon-desc {
-        color: #ccc;
-        font-size: 14px;
-        margin-top: 8px;
-        line-height: 1.4;
-    }
-    .addon-link {
-        display: inline-block;
-        margin-top: 10px;
-        color: #aaa;
-        text-decoration: none;
-        font-size: 14px;
-    }
-    .addon-link:hover {
-        color: #fff;
-    }
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:20px;color:#111}
+  header{margin-bottom:16px}
+  .addons-list{display:flex;flex-direction:column;gap:8px;max-width:980px}
+  .addon-item{border:1px solid #ddd;padding:10px;border-radius:6px;display:flex;align-items:center;justify-content:space-between}
+  .meta{font-size:0.9rem;color:#444}
+  .badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:0.75rem;margin-left:8px}
+  .badge.video{background:#e6f0ff;color:#0b57d0}
+  .badge.audio{background:#fff0e6;color:#d05a00}
+  .badge.program{background:#f0f7e6;color:#3a7a00}
+  .badge.image{background:#f6e6ff;color:#6a2fb0}
+  .badge.service{background:#eef6f6;color:#0a6b6b}
+  .badge.other{background:#f8e6e6;color:#b00000}
+  .filename{font-family:monospace;color:#222}
+  .missing{color:#b00;font-weight:600;margin-left:10px}
+  .controls{margin-bottom:12px}
+  .search{padding:6px;border:1px solid #ccc;border-radius:6px;width:320px}
 </style>
 </head>
-
 <body>
+<header>
+  <h1>vmod.open.repo — Addon Listing</h1>
+  <p class="meta">Die Kategorie wird aus dem ZIP‑Dateinamen abgeleitet (z. B. <code>plugin.video.*</code>, <code>plugin.audio.*</code>, <code>plugin.program.*</code>).</p>
+</header>
 
-<header>D.A. Offene Kodi Repo</header>
-
-<div class="container">
-
-    <select id="categoryFilter">
-        <option value="all">Alle Kategorien</option>
-        <option value="TV">TV</option>
-        <option value="Erotik">Erotik</option>
-        <option value="Video">Video</option>
-        <option value="Programm">Programm</option>
-        <option value="Script">Script</option>
-    </select>
-
-    <div id="addonList"></div>
+<div class="controls">
+  <input id="filter" class="search" placeholder="Filter (Name, Kategorie) eingeben">
 </div>
 
+<main id="main">
+  <section id="addons" class="addons-list" aria-live="polite">
+    <!-- Beispiel‑Einträge: ersetze oder erweitere diese Liste durch deine tatsächlichen Links/Einträge -->
+    <article class="addon-item" data-filename="plugin.audio.mixcloud-420.3.0.2.zip" data-id="plugin.audio.mixcloud">
+      <div>
+        <div class="title"><strong class="addon-name">plugin.audio.mixcloud</strong></div>
+        <div class="meta filename">plugin.audio.mixcloud-420.3.0.2.zip</div>
+      </div>
+      <div class="right">
+        <a class="download-link" href="releases/plugin.audio.mixcloud-420.3.0.2.zip" download>Download</a>
+      </div>
+    </article>
+
+    <article class="addon-item" data-filename="plugin.video.MetalOnMetal-1.0.14.zip" data-id="plugin.video.metalonmetal">
+      <div>
+        <div class="title"><strong class="addon-name">plugin.video.MetalOnMetal</strong></div>
+        <div class="meta filename">plugin.video.MetalOnMetal-1.0.14.zip</div>
+      </div>
+      <div class="right">
+        <a class="download-link" href="releases/plugin.video.MetalOnMetal-1.0.14.zip" download>Download</a>
+      </div>
+    </article>
+
+    <article class="addon-item" data-filename="plugin.close.kodi-3.1.3.zip" data-id="plugin.close.kodi">
+      <div>
+        <div class="title"><strong class="addon-name">plugin.close.kodi</strong></div>
+        <div class="meta filename">plugin.close.kodi-3.1.3.zip</div>
+      </div>
+      <div class="right">
+        <a class="download-link" href="releases/plugin.close.kodi-3.1.3.zip" download>Download</a>
+      </div>
+    </article>
+
+    <!-- Weitere Einträge: du kannst die Liste erweitern oder durch serverseitiges Rendering ersetzen -->
+  </section>
+</main>
+
 <script>
-function shorten(text, max = 200) {
-    return text.length > max ? text.substring(0, max) + "…" : text;
-}
+/* Deterministische Kategorisierung aus Dateiname/ID.
+   Regeln (Priorität): video → audio → program → image → service → other
+   Keine Änderungen an Serverdateien; DOM‑Attribute werden gesetzt und sichtbar gemacht.
+*/
+(function(){
+  function stripBOM(s){ return (s||'').toString().replace(/^\uFEFF/, ''); }
+  function norm(s){ return stripBOM(s).toString().trim().toLowerCase(); }
 
-function getBestDescription(addon) {
-    const descriptions = addon.getElementsByTagName("description");
-    let de = null, en = null, fallback = null;
+  var rules = [
+    {re: /plugin[\._-]?video|(^|[^a-z0-9])video([^a-z0-9]|$)/i, cat:'video'},
+    {re: /plugin[\._-]?(audio|music)|(^|[^a-z0-9])(audio|music)([^a-z0-9]|$)/i, cat:'audio'},
+    {re: /plugin[\._-]?program|(^|[^a-z0-9])program([^a-z0-9]|$)|\bscript\b/i, cat:'program'},
+    {re: /plugin[\._-]?image|image|pdfreader|picture|gallery|skin/i, cat:'image'},
+    {re: /\bservice\b|\bdaemon\b/i, cat:'service'}
+  ];
 
-    for (let d of descriptions) {
-        const lang = d.getAttribute("lang");
-        if (lang === "de") de = d.textContent;
-        else if (lang === "en") en = d.textContent;
-        else if (!lang) fallback = d.textContent;
+  function inferCategory(s){
+    var t = norm(s);
+    for(var i=0;i<rules.length;i++){
+      if(rules[i].re.test(t)) return rules[i].cat;
     }
-    return de || en || fallback || "";
-}
+    return 'other';
+  }
 
-async function loadAddons() {
-    const response = await fetch("addons.xml");
-    const xmlText = await response.text();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText, "text/xml");
-
-    const addons = xml.getElementsByTagName("addon");
-    const addonList = document.getElementById("addonList");
-
-    const addonArray = [];
-
-    for (let addon of addons) {
-        const id = addon.getAttribute("id");
-        const name = addon.getElementsByTagName("name")[0]?.textContent || id;
-        const desc = getBestDescription(addon);
-
-        let category = "Sonstiges";
-        const ext = addon.getElementsByTagName("extension")[0];
-
-        if (ext) {
-            const point = ext.getAttribute("point") || "";
-            if (point.includes("video")) category = "Video";
-            else if (point.includes("audio")) category = "Audio";
-            else if (point.includes("program")) category = "Programm";
-            else if (point.includes("script")) category = "Script";
-            else if (point.includes("skin")) category = "Skins";
-            else if (point.includes("repository")) category = "Repository";
-        }
-
-        addonArray.push({ id, name, desc, category });
+  function applyBadges(item, cat){
+    var existing = item.querySelector('.badge');
+    if(existing) existing.remove();
+    var span = document.createElement('span');
+    span.className = 'badge ' + cat;
+    span.textContent = cat;
+    item.querySelector('.title').appendChild(span);
+    if(cat === 'other'){
+      var m = item.querySelector('.missing');
+      if(!m){
+        var miss = document.createElement('span');
+        miss.className = 'missing';
+        miss.textContent = 'unbestimmte Kategorie';
+        item.querySelector('.meta').appendChild(miss);
+      }
     }
+  }
 
-    renderAddons(addonArray);
+  function normalizeName(item){
+    var nameEl = item.querySelector('.addon-name');
+    if(nameEl) nameEl.textContent = stripBOM(nameEl.textContent).trim();
+    else {
+      var id = item.getAttribute('data-id') || '';
+      item.setAttribute('data-name', id || '');
+    }
+  }
 
-    document.getElementById("categoryFilter").addEventListener("change", () => {
-        const selected = document.getElementById("categoryFilter").value;
-        if (selected === "all") renderAddons(addonArray);
-        else renderAddons(addonArray.filter(a => a.category === selected));
+  function processAll(){
+    var container = document.getElementById('addons');
+    var items = Array.from(container.querySelectorAll('.addon-item'));
+    items.forEach(function(it){
+      normalizeName(it);
+      var filename = it.getAttribute('data-filename') || (it.querySelector('.filename') && it.querySelector('.filename').textContent) || '';
+      var id = it.getAttribute('data-id') || '';
+      var prov = it.getAttribute('data-provides') || '';
+      prov = norm(prov);
+      if(!prov){
+        prov = inferCategory(id || filename || it.textContent || '');
+        it.classList.add('inferred-provides');
+      }
+      it.setAttribute('data-provides', prov);
+      var name = it.getAttribute('data-name') || (it.querySelector('.addon-name') && it.querySelector('.addon-name').textContent) || '';
+      it.setAttribute('data-name', name);
+      applyBadges(it, prov);
     });
-}
 
-function renderAddons(addons) {
-    const addonList = document.getElementById("addonList");
-    addonList.innerHTML = "";
-
-    addons.forEach(addon => {
-        const div = document.createElement("div");
-        div.className = "addon";
-
-        div.innerHTML = `
-            <div class="addon-title">${addon.name}</div>
-            <div class="addon-category">${addon.category}</div>
-            <div class="addon-desc">${shorten(addon.desc, 300)}</div>
-            <a class="addon-link" href="addon.html?id=${addon.id}">Details anzeigen →</a>
-        `;
-
-        addonList.appendChild(div);
+    // stabile Sortierung: name -> id
+    items.sort(function(a,b){
+      var na = (a.getAttribute('data-name')||'').toLowerCase();
+      var nb = (b.getAttribute('data-name')||'').toLowerCase();
+      if(na === nb) return (a.getAttribute('data-id')||'').localeCompare(b.getAttribute('data-id')||'');
+      return na.localeCompare(nb);
     });
-}
+    items.forEach(function(i){ container.appendChild(i); });
+  }
 
-loadAddons();
+  document.addEventListener('DOMContentLoaded', function(){
+    processAll();
+    // Filter input
+    var filter = document.getElementById('filter');
+    filter.addEventListener('input', function(){
+      var q = norm(this.value);
+      var items = Array.from(document.querySelectorAll('.addon-item'));
+      items.forEach(function(it){
+        var name = (it.getAttribute('data-name')||'') + ' ' + (it.getAttribute('data-provides')||'') + ' ' + (it.getAttribute('data-id')||'');
+        if(name.toLowerCase().indexOf(q) !== -1) it.style.display = '';
+        else it.style.display = 'none';
+      });
+    });
+  });
+})();
 </script>
-
 </body>
 </html>
-
