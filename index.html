@@ -21,17 +21,16 @@
   .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),var(--glass));border:1px solid var(--border);padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:8px}
   .title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .addon-name{font-weight:600;color:#eaf6ff;word-break:break-all}
-  .badge{font-size:0.75rem;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
   .filename{font-family:ui-monospace,monospace;color:var(--muted);font-size:0.86rem}
-  .row-actions{display:flex;gap:8px;align-items:center}
-  .link{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--accent);text-decoration:none;font-weight:600}
-  .download{background:rgba(125,211,252,0.12);border:1px solid rgba(125,211,252,0.12);padding:8px 10px;border-radius:8px;color:var(--accent);text-decoration:none;font-weight:700}
+  .row-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .link{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--accent);text-decoration:none;font-weight:600;display:inline-block}
+  .download{background:rgba(125,211,252,0.12);border:1px solid rgba(125,211,252,0.12);padding:8px 10px;border-radius:8px;color:var(--accent);text-decoration:none;font-weight:700;display:inline-block}
   .muted{color:var(--muted);font-size:0.85rem}
   .small{font-size:0.82rem;color:var(--muted)}
   .filters{display:flex;gap:8px;align-items:center}
   .filter-btn{background:transparent;border:1px solid var(--border);padding:6px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
   .filter-btn.active{border-color:var(--accent);color:var(--accent)}
-  @media (max-width:520px){ .controls{flex-direction:column;align-items:stretch} .search{width:100%} }
+  @media (max-width:520px){ .controls{flex-direction:column;align-items:stretch} .search{width:100%} .row-actions{align-items:flex-start} }
 </style>
 </head>
 <body>
@@ -55,6 +54,8 @@
       <button class="filter-btn" data-cat="audio">Audio</button>
       <button class="filter-btn" data-cat="program">Program</button>
       <button class="filter-btn" data-cat="image">Image</button>
+      <button class="filter-btn" data-cat="module">Module</button>
+      <button class="filter-btn" data-cat="repository">Repository</button>
       <button class="filter-btn" data-cat="service">Service</button>
       <button class="filter-btn" data-cat="other">Other</button>
     </div>
@@ -171,8 +172,13 @@ const ZIP_LIST = [
 
 /* Hilfsfunktionen */
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* Kategorisierung erweitert: repository + module */
 function inferCategory(s){
   const t = (s||'').toLowerCase();
+  if(/^repository\./.test(t)) return 'repository';
+  if(/^script\.module\.|^script\.module|^script\.module/.test(t)) return 'module';
+  if(/^script\./.test(t) && t.indexOf('module') !== -1) return 'module';
   if(/plugin[\._-]?video|[^a-z]video[^a-z]/.test(t)) return 'video';
   if(/plugin[\._-]?(audio|music)/.test(t)) return 'audio';
   if(/plugin[\._-]?program|^script\./.test(t)) return 'program';
@@ -180,14 +186,15 @@ function inferCategory(s){
   if(/service\./.test(t)) return 'service';
   return 'other';
 }
+
+/* ID-Ableitung (Versionen entfernen) */
 function deriveId(fn){
   const base = fn.replace(/\.zip$/i,'');
-  // Entferne typische Versionssuffixe: -1.2.3, -2026.03.01, -v1, -1.0.3g+matrix, -Mod ...
   const m = base.match(/^(.*?)(-\d[\w\.\+\-].*|-(mod|matrix|v)\b.*)$/i);
   return m && m[1] ? m[1] : base;
 }
 
-/* Baue Map id -> versions */
+/* Map id -> versions */
 function buildMap(list){
   const map = new Map();
   list.forEach(fn=>{
@@ -196,12 +203,11 @@ function buildMap(list){
     if(!map.has(id)) map.set(id, {id, category:cat, versions:[]});
     map.get(id).versions.push({filename:fn});
   });
-  // sortiere Versionen
   for(const g of map.values()) g.versions.sort((a,b)=> a.filename.localeCompare(b.filename));
   return map;
 }
 
-/* Render: eine Karte pro Addon-ID */
+/* Render: eine Karte pro Addon-ID; Versionslink unter Download */
 function render(filterQ='', filterCat='all'){
   const container = document.getElementById('list');
   container.innerHTML = '';
@@ -220,8 +226,8 @@ function render(filterQ='', filterCat='all'){
           <div class="filename">${escapeHtml(rep.filename)}</div>
         </div>
         <div class="row-actions">
-          <a class="link" href="addon.html?id=${encodeURIComponent(group.id)}">Versionen (${group.versions.length})</a>
           <a class="download" href="releases/${encodeURIComponent(rep.filename)}" download>Download</a>
+          <a class="link" href="addon.html?id=${encodeURIComponent(group.id)}">Versionen (${group.versions.length})</a>
         </div>
       </div>
       <div class="small muted">Kategorie: ${escapeHtml(group.category)}</div>
