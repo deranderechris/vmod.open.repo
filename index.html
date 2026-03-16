@@ -1,67 +1,228 @@
-    
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kodi Repo Übersicht</title>
-  <style>
-                html, body {
-                  background: #000 !important;
-                }
-            /* Vertikaler Trennstrich zwischen den Gruppen */
-            .addon-list {
-              position: relative;
-            }
-            .addon-list::before {
-              content: "";
-              position: absolute;
-              top: 2rem;
-              bottom: 2rem;
-              left: 50%;
-              width: 2px;
-              background: linear-gradient(to bottom, #00ff90cc 10%, #10101000 90%);
-              z-index: 1;
-              border-radius: 2px;
-              pointer-events: none;
-              html, body {
-                background: #181a1b;
-                color: #e0e0e0;
-                font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
-                margin: 0;
-                padding: 0;
-                min-height: 100vh;
-                letter-spacing: 0.2px;
-              }
-              header {
-                background: #1a1c1e;
-                padding: 2.5rem 1rem 1.5rem 1rem;
-                text-align: center;
-                border-bottom: 1.5px solid #232728;
-                box-shadow: 0 2px 24px #23272833;
-              }
-              h1 {
-                margin: 0;
-                font-size: 2.3rem;
-                letter-spacing: 2px;
-                color: #e0e0e0;
-                font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
-                font-weight: 700;
-                text-transform: uppercase;
-              }
-              .addon-list {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
-                gap: 2.2rem 2.2rem;
-                max-width: 1200px;
-                margin: 2.5rem auto;
-                background: #202224;
-                border-radius: 18px;
-                box-shadow: 0 0 32px #23272844, 0 0 80px #23272822 inset;
-                padding: 2.5rem 2rem;
-                border: 1.5px solid #232728;
-                position: relative;
-                overflow: visible;
+<meta charset="UTF-8">
+<title>VMOD Open Repo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        margin: 0;
+        background: #0d0d0d;
+        font-family: Arial, sans-serif;
+        color: #e0e0e0;
+    }
+
+    header {
+        padding: 20px;
+        text-align: center;
+        background: #111;
+        border-bottom: 2px solid #0bb4a2;
+        font-size: 28px;
+        font-weight: bold;
+        color: #0bb4a2;
+    }
+
+    #controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        padding: 20px;
+        flex-wrap: wrap;
+    }
+
+    select, input {
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background: #1a1a1a;
+        color: #e0e0e0;
+        outline: 2px solid #0bb4a2;
+        font-size: 15px;
+    }
+
+    #search {
+        width: 250px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .addon {
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #0bb4a2;
+    }
+
+    .addon:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px #0bb4a2;
+    }
+
+    .addon img {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+
+    .addon-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #0bb4a2;
+        margin-bottom: 5px;
+    }
+
+    .addon-version {
+        font-size: 14px;
+        color: #aaa;
+        margin-bottom: 10px;
+    }
+
+    .addon-desc {
+        font-size: 13px;
+        color: #ccc;
+        height: 40px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 15px;
+        background: #0bb4a2;
+        color: #000;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .btn:hover {
+        background: #0ee3cc;
+    }
+</style>
+</head>
+
+<body>
+
+<header>VMOD Open Repository</header>
+
+<div id="controls">
+    <input id="search" type="text" placeholder="Addons durchsuchen…">
+    <select id="categoryFilter">
+        <option value="all">Alle Kategorien</option>
+    </select>
+    <select id="sort">
+        <option value="az">Sortierung: A–Z</option>
+        <option value="za">Sortierung: Z–A</option>
+        <option value="newest">Neueste Version zuerst</option>
+        <option value="oldest">Älteste Version zuerst</option>
+    </select>
+</div>
+
+<div class="grid" id="addonGrid"></div>
+
+<script>
+let addonList = [];
+
+async function loadAddons() {
+    const response = await fetch("addons.xml");
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "text/xml");
+
+    const addons = xml.getElementsByTagName("addon");
+    const categories = new Set();
+
+    for (let addon of addons) {
+        const id = addon.getAttribute("id");
+        const version = addon.getAttribute("version");
+        const name = addon.getElementsByTagName("name")[0]?.textContent || id;
+        const desc = addon.getElementsByTagName("description")[0]?.textContent || "";
+        const icon = addon.getElementsByTagName("icon")[0]?.textContent || "icon.png";
+
+        let category = "Sonstiges";
+        const ext = addon.getElementsByTagName("extension")[0];
+        if (ext) {
+            const point = ext.getAttribute("point") || "";
+            if (point.includes("video")) category = "Video";
+            else if (point.includes("audio")) category = "Audio";
+            else if (point.includes("program")) category = "Programme";
+            else if (point.includes("skin")) category = "Skins";
+            else if (point.includes("repository")) category = "Repository";
+        }
+
+        categories.add(category);
+
+        addonList.push({
+            id, version, name, desc, icon,
+            zip: `${id}-${version}.zip`,
+            category
+        });
+    }
+
+    const catSelect = document.getElementById("categoryFilter");
+    categories.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        catSelect.appendChild(opt);
+    });
+
+    renderAddons();
+}
+
+function renderAddons() {
+    const grid = document.getElementById("addonGrid");
+    grid.innerHTML = "";
+
+    const searchTerm = document.getElementById("search").value.toLowerCase();
+    const selectedCat = document.getElementById("categoryFilter").value;
+    const sortMode = document.getElementById("sort").value;
+
+    let filtered = addonList.filter(a =>
+        a.name.toLowerCase().includes(searchTerm) &&
+        (selectedCat === "all" || a.category === selectedCat)
+    );
+
+    if (sortMode === "az") filtered.sort((a, b) => a.name.localeCompare(b.name));
+    if (sortMode === "za") filtered.sort((a, b) => b.name.localeCompare(a.name));
+    if (sortMode === "newest") filtered.sort((a, b) => b.version.localeCompare(a.version));
+    if (sortMode === "oldest") filtered.sort((a, b) => a.version.localeCompare(b.version));
+
+    filtered.forEach(addon => {
+        const card = document.createElement("div");
+        card.className = "addon";
+
+        card.innerHTML = `
+            <img src="${addon.icon}" alt="${addon.name}">
+            <div class="addon-title">${addon.name}</div>
+            <div class="addon-version">Version: ${addon.version}</div>
+            <div class="addon-desc">${addon.desc}</div>
+            <div style="margin-bottom:10px;color:#0bb4a2;">${addon.category}</div>
+            <a class="btn" href="${addon.zip}" download>Download</a>
+        `;
+
+        grid.appendChild(card);
+    });
+}
+
+document.getElementById("search").addEventListener("input", renderAddons);
+document.getElementById("categoryFilter").addEventListener("change", renderAddons);
+document.getElementById("sort").addEventListener("change", renderAddons);
+
+loadAddons();
+</script>
+
+</body>
+</html>
               }
               .addon-group {
                 background: #232728;
