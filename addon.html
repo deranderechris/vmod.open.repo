@@ -1,4 +1,4 @@
-<!-- rebuild-addon1 -->
+<!-- rebuild-addon2 -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -97,7 +97,7 @@
 
 <body>
 
-<header>Addon Details</header>
+<header>D.A. Offene Kodi Repo</header>
 
 <div class="container">
     <h2 id="addonName"></h2>
@@ -115,6 +115,67 @@ function shorten(text, max = 200) {
     return text.length > max ? text.substring(0, max) + "…" : text;
 }
 
+// automatische Übersetzung
+function translateToGerman(text) {
+    const replacements = {
+        "addon": "Addon",
+        "favorites": "Favoriten",
+        "favourites": "Favoriten",
+        "improves": "verbessert",
+        "improve": "verbessern",
+        "experience": "Erlebnis",
+        "management": "Verwaltung",
+        "manager": "Manager",
+        "flow": "Flow",
+        "simple": "einfach",
+        "advanced": "erweitert",
+        "settings": "Einstellungen",
+        "tools": "Werkzeuge",
+        "videos": "Videos",
+        "video": "Video",
+        "live": "Live",
+        "channels": "Kanäle",
+        "channel": "Kanal",
+        "stream": "Stream",
+        "streams": "Streams",
+        "content": "Inhalt",
+        "adult": "Erwachsenen",
+        "porn": "Erotik",
+        "sport": "Sport",
+        "music": "Musik"
+    };
+
+    let result = text;
+
+    for (const [en, de] of Object.entries(replacements)) {
+        const regex = new RegExp("\\b" + en + "\\b", "gi");
+        result = result.replace(regex, de);
+    }
+
+    return result;
+}
+
+// beste Beschreibung auswählen
+function getBestDescription(addon) {
+    const descriptions = addon.getElementsByTagName("description");
+
+    let de = null, en = null, fallback = null;
+
+    for (let d of descriptions) {
+        const lang = d.getAttribute("lang");
+
+        if (lang === "de") de = d.textContent;
+        else if (lang === "en") en = d.textContent;
+        else if (!lang) fallback = d.textContent;
+    }
+
+    if (de) return de;
+    if (en) return translateToGerman(en);
+    if (fallback) return translateToGerman(fallback);
+
+    return "";
+}
+
 async function loadAddon() {
     const params = new URLSearchParams(window.location.search);
     const addonId = params.get("id");
@@ -130,15 +191,16 @@ async function loadAddon() {
     for (let addon of addons) {
         if (addon.getAttribute("id") === addonId) {
             const name = addon.getElementsByTagName("name")[0]?.textContent || addonId;
-            const desc = addon.getElementsByTagName("description")[0]?.textContent || "";
-            let category = "Sonstiges";
+            const desc = getBestDescription(addon);
 
+            let category = "Sonstiges";
             const ext = addon.getElementsByTagName("extension")[0];
             if (ext) {
                 const point = ext.getAttribute("point") || "";
                 if (point.includes("video")) category = "Video";
                 else if (point.includes("audio")) category = "Audio";
-                else if (point.includes("program")) category = "Programme";
+                else if (point.includes("program")) category = "Programm";
+                else if (point.includes("script")) category = "Script";
                 else if (point.includes("skin")) category = "Skins";
                 else if (point.includes("repository")) category = "Repository";
             }
