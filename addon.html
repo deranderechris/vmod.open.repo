@@ -1,4 +1,4 @@
-<!-- rebuild-addon2 -->
+<!-- rebuild-addon3 -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -115,47 +115,7 @@ function shorten(text, max = 200) {
     return text.length > max ? text.substring(0, max) + "…" : text;
 }
 
-// automatische Übersetzung
-function translateToGerman(text) {
-    const replacements = {
-        "addon": "Addon",
-        "favorites": "Favoriten",
-        "favourites": "Favoriten",
-        "improves": "verbessert",
-        "improve": "verbessern",
-        "experience": "Erlebnis",
-        "management": "Verwaltung",
-        "manager": "Manager",
-        "flow": "Flow",
-        "simple": "einfach",
-        "advanced": "erweitert",
-        "settings": "Einstellungen",
-        "tools": "Werkzeuge",
-        "videos": "Videos",
-        "video": "Video",
-        "live": "Live",
-        "channels": "Kanäle",
-        "channel": "Kanal",
-        "stream": "Stream",
-        "streams": "Streams",
-        "content": "Inhalt",
-        "adult": "Erwachsenen",
-        "porn": "Erotik",
-        "sport": "Sport",
-        "music": "Musik"
-    };
-
-    let result = text;
-
-    for (const [en, de] of Object.entries(replacements)) {
-        const regex = new RegExp("\\b" + en + "\\b", "gi");
-        result = result.replace(regex, de);
-    }
-
-    return result;
-}
-
-// beste Beschreibung auswählen
+// Nur DE → EN → Fallback
 function getBestDescription(addon) {
     const descriptions = addon.getElementsByTagName("description");
 
@@ -169,11 +129,7 @@ function getBestDescription(addon) {
         else if (!lang) fallback = d.textContent;
     }
 
-    if (de) return de;
-    if (en) return translateToGerman(en);
-    if (fallback) return translateToGerman(fallback);
-
-    return "";
+    return de || en || fallback || "";
 }
 
 async function loadAddon() {
