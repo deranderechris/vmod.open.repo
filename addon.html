@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Addon Versionen</title>
+<title>Addon — Versionen</title>
 <style>
   :root{--bg:#071018;--card:#0f1720;--muted:#9aa6b2;--accent:#7dd3fc}
   body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef6;background:linear-gradient(180deg,#041018,#071018);padding:20px}
@@ -16,6 +16,7 @@
   .filename{font-family:ui-monospace,monospace;color:var(--muted)}
   .download{background:var(--accent);color:#04263b;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:700}
   .back{color:var(--accent);text-decoration:none;font-weight:600}
+  .muted{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -26,7 +27,7 @@
       <div class="meta" id="subtitle"></div>
     </div>
     <div>
-      <a class="back" href="index.html">← Zurück</a>
+      <a class="back" href="index.html">← Zurück zur Übersicht</a>
     </div>
   </header>
 
@@ -36,8 +37,8 @@
 </div>
 
 <script>
+/* Gleiche ZIP‑Liste wie in index.html */
 const ZIP_LIST = [
-/* gleiche Liste wie in index.html */
 "plugin.audio.mixcloud-420.3.0.2.zip",
 "plugin.audio.mixcloud-420.3.0.4.zip",
 "plugin.audio.mp3streams-2025.0.1.zip",
@@ -141,22 +142,24 @@ const ZIP_LIST = [
 "service.subtitles.all_subs_plus-2.3.zip"
 ];
 
-function deriveId(fn){ return fn.replace(/\.zip$/i,'').replace(/(-\d[\w\.\+\-].*)$/,''); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function deriveId(fn){ const base = fn.replace(/\.zip$/i,''); const m = base.match(/^(.*?)(-\d[\w\.\+\-].*|-(mod|matrix|v)\b.*)$/i); return m && m[1] ? m[1] : base; }
+
 function getParam(n){ return new URLSearchParams(location.search).get(n); }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  const id = getParam('id');
+  const id = getParam('id') || '';
   const title = document.getElementById('title');
   const subtitle = document.getElementById('subtitle');
   const container = document.getElementById('versions');
   if(!id){ title.textContent='Kein Addon angegeben'; subtitle.textContent='Aufruf: addon.html?id=plugin.video.macvod'; return; }
   title.textContent = id;
-  const versions = ZIP_LIST.filter(fn=> deriveId(fn).toLowerCase() === id.toLowerCase()).sort();
-  if(versions.length===0){ subtitle.textContent = 'Keine Versionen gefunden'; return; }
+  const versions = ZIP_LIST.filter(fn=> deriveId(fn).toLowerCase() === id.toLowerCase()).sort((a,b)=> a.localeCompare(b));
+  if(versions.length === 0){ subtitle.textContent = 'Keine Versionen gefunden für: ' + id; return; }
   subtitle.textContent = 'Versionen: ' + versions.length;
   versions.forEach(fn=>{
     const el = document.createElement('div'); el.className='version';
-    el.innerHTML = `<div class="filename">${fn}</div><div><a class="download" href="releases/${encodeURIComponent(fn)}" download>Download</a></div>`;
+    el.innerHTML = `<div class="filename">${escapeHtml(fn)}</div><div><a class="download" href="releases/${encodeURIComponent(fn)}" download>Download</a></div>`;
     container.appendChild(el);
   });
 });
