@@ -6,13 +6,13 @@
 <title>vmod.open.repo — Addons</title>
 <style>
   :root{
-    --bg:#0b0f14; --card:#0f1720; --muted:#9aa6b2; --accent:#7dd3fc; --accent-2:#60a5fa;
+    --bg:#071018; --card:#0f1720; --muted:#9aa6b2; --accent:#7dd3fc; --accent-2:#60a5fa;
     --border:rgba(255,255,255,0.04); --glass:rgba(255,255,255,0.03);
   }
-  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#e6eef6;background:linear-gradient(180deg,#071018 0%,var(--bg) 100%);}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef6;background:linear-gradient(180deg,#041018,#071018);-webkit-font-smoothing:antialiased}
   .wrap{max-width:1200px;margin:28px auto;padding:20px}
   header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  h1{font-size:1.1rem;margin:0;font-weight:600;letter-spacing:0.2px}
+  h1{font-size:1.1rem;margin:0;font-weight:600}
   .lead{color:var(--muted);font-size:0.92rem}
   .controls{display:flex;gap:12px;align-items:center;margin-top:14px}
   .search{background:var(--card);border:1px solid var(--border);padding:10px 12px;border-radius:10px;color:inherit;min-width:320px}
@@ -28,7 +28,9 @@
   .download{background:rgba(125,211,252,0.12);border:1px solid rgba(125,211,252,0.12);padding:8px 10px;border-radius:8px;color:var(--accent);text-decoration:none;font-weight:700}
   .muted{color:var(--muted);font-size:0.85rem}
   .small{font-size:0.82rem;color:var(--muted)}
-  .hidden{display:none}
+  .filters{display:flex;gap:8px;align-items:center}
+  .filter-btn{background:transparent;border:1px solid var(--border);padding:6px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+  .filter-btn.active{border-color:var(--accent);color:var(--accent)}
   @media (max-width:520px){ .controls{flex-direction:column;align-items:stretch} .search{width:100%} }
 </style>
 </head>
@@ -37,23 +39,32 @@
   <header>
     <div>
       <h1>vmod.open.repo — Addons</h1>
-      <div class="lead">Dunkles, modernes Listing. Klick auf einen Addon‑Namen für Versionen.</div>
+      <div class="lead">Übersicht: pro Addon eine Karte. Klick auf "Versionen" für alle ZIPs.</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
       <a class="repo-zip" href="releases/repo.zip" download>Repo ZIP herunterladen</a>
-      <div class="small">Letzte Aktualisierung: manuell</div>
+      <div class="small">Manuelle Aktualisierung</div>
     </div>
   </header>
 
-  <div class="controls">
+  <div class="controls" style="margin-top:12px">
     <input id="filter" class="search" placeholder="Filter (Name, Kategorie, Dateiname)">
+    <div class="filters" aria-hidden="false" style="margin-left:auto">
+      <button class="filter-btn active" data-cat="all">Alle</button>
+      <button class="filter-btn" data-cat="video">Video</button>
+      <button class="filter-btn" data-cat="audio">Audio</button>
+      <button class="filter-btn" data-cat="program">Program</button>
+      <button class="filter-btn" data-cat="image">Image</button>
+      <button class="filter-btn" data-cat="service">Service</button>
+      <button class="filter-btn" data-cat="other">Other</button>
+    </div>
   </div>
 
   <section id="list" class="grid" aria-live="polite"></section>
 </div>
 
 <script>
-/* ZIP_LIST: füge hier die vollständige Liste ein (oder lade dynamisch) */
+/* Vollständige ZIP‑Liste (aus deiner Eingabe) */
 const ZIP_LIST = [
 "plugin.audio.mixcloud-420.3.0.2.zip",
 "plugin.audio.mixcloud-420.3.0.4.zip",
@@ -158,61 +169,80 @@ const ZIP_LIST = [
 "service.subtitles.all_subs_plus-2.3.zip"
 ];
 
+/* Hilfsfunktionen */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function inferCategory(s){
   const t = (s||'').toLowerCase();
   if(/plugin[\._-]?video|[^a-z]video[^a-z]/.test(t)) return 'video';
   if(/plugin[\._-]?(audio|music)/.test(t)) return 'audio';
-  if(/plugin[\._-]?program|script\./.test(t)) return 'program';
+  if(/plugin[\._-]?program|^script\./.test(t)) return 'program';
   if(/plugin[\._-]?image|pdfreader|gallery/.test(t)) return 'image';
   if(/service\./.test(t)) return 'service';
   return 'other';
 }
 function deriveId(fn){
   const base = fn.replace(/\.zip$/i,'');
-  const m = base.match(/^(.*?)(-\d[\w\.\+\-].*)$/);
-  return m ? m[1] : base;
+  // Entferne typische Versionssuffixe: -1.2.3, -2026.03.01, -v1, -1.0.3g+matrix, -Mod ...
+  const m = base.match(/^(.*?)(-\d[\w\.\+\-].*|-(mod|matrix|v)\b.*)$/i);
+  return m && m[1] ? m[1] : base;
 }
 
-function render(){
-  const container = document.getElementById('list');
+/* Baue Map id -> versions */
+function buildMap(list){
   const map = new Map();
-  ZIP_LIST.forEach(fn=>{
+  list.forEach(fn=>{
     const id = deriveId(fn);
     const cat = inferCategory(fn + ' ' + id);
-    if(!map.has(id)) map.set(id, []);
-    map.get(id).push({filename:fn, id, category:cat});
+    if(!map.has(id)) map.set(id, {id, category:cat, versions:[]});
+    map.get(id).versions.push({filename:fn});
   });
-  const ids = Array.from(map.keys()).sort((a,b)=> a.localeCompare(b));
-  ids.forEach(id=>{
-    const versions = map.get(id).sort((a,b)=> a.filename.localeCompare(b.filename));
-    versions.forEach(v=>{
-      const card = document.createElement('div'); card.className='card';
-      card.innerHTML = `
-        <div class="title-row">
-          <div style="min-width:0">
-            <div class="addon-name">${v.id}</div>
-            <div class="filename">${v.filename}</div>
-          </div>
-          <div class="row-actions">
-            <a class="link" href="addon.html?id=${encodeURIComponent(v.id)}">Versionen</a>
-            <a class="download" href="releases/${encodeURIComponent(v.filename)}" download>Download</a>
-          </div>
+  // sortiere Versionen
+  for(const g of map.values()) g.versions.sort((a,b)=> a.filename.localeCompare(b.filename));
+  return map;
+}
+
+/* Render: eine Karte pro Addon-ID */
+function render(filterQ='', filterCat='all'){
+  const container = document.getElementById('list');
+  container.innerHTML = '';
+  const map = buildMap(ZIP_LIST);
+  const groups = Array.from(map.values()).sort((a,b)=> a.id.localeCompare(b.id, undefined, {sensitivity:'base'}));
+  groups.forEach(group=>{
+    if(filterCat !== 'all' && group.category !== filterCat) return;
+    const rep = group.versions[group.versions.length - 1];
+    const text = (group.id + ' ' + rep.filename + ' ' + group.category).toLowerCase();
+    if(filterQ && text.indexOf(filterQ.toLowerCase()) === -1) return;
+    const card = document.createElement('div'); card.className='card';
+    card.innerHTML = `
+      <div class="title-row">
+        <div style="min-width:0">
+          <div class="addon-name">${escapeHtml(group.id)}</div>
+          <div class="filename">${escapeHtml(rep.filename)}</div>
         </div>
-        <div class="small muted">Kategorie: ${v.category}</div>
-      `;
-      container.appendChild(card);
-    });
+        <div class="row-actions">
+          <a class="link" href="addon.html?id=${encodeURIComponent(group.id)}">Versionen (${group.versions.length})</a>
+          <a class="download" href="releases/${encodeURIComponent(rep.filename)}" download>Download</a>
+        </div>
+      </div>
+      <div class="small muted">Kategorie: ${escapeHtml(group.category)}</div>
+    `;
+    container.appendChild(card);
   });
 }
 
-document.addEventListener('DOMContentLoaded', function(){
-  render();
+/* Interaktionen */
+document.addEventListener('DOMContentLoaded', ()=>{
   const filter = document.getElementById('filter');
-  filter.addEventListener('input', function(){
-    const q = (this.value||'').toLowerCase();
-    document.querySelectorAll('.card').forEach(card=>{
-      const text = card.textContent.toLowerCase();
-      card.style.display = q === '' || text.indexOf(q) !== -1 ? '' : 'none';
+  const btns = Array.from(document.querySelectorAll('.filter-btn'));
+  let activeCat = 'all';
+  render();
+  filter.addEventListener('input', ()=> render(filter.value, activeCat));
+  btns.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      btns.forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      activeCat = b.getAttribute('data-cat') || 'all';
+      render(filter.value, activeCat);
     });
   });
 });
