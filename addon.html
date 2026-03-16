@@ -144,7 +144,6 @@ const ZIP_LIST = [
 
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function deriveId(fn){ const base = fn.replace(/\.zip$/i,''); const m = base.match(/^(.*?)(-\d[\w\.\+\-].*|-(mod|matrix|v)\b.*)$/i); return m && m[1] ? m[1] : base; }
-
 function getParam(n){ return new URLSearchParams(location.search).get(n); }
 
 document.addEventListener('DOMContentLoaded', ()=>{
