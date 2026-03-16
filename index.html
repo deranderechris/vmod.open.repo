@@ -5,167 +5,256 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>vmod.open.repo — Addons</title>
 <style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:20px;color:#111}
-  header{margin-bottom:16px}
-  .addons-list{display:flex;flex-direction:column;gap:8px;max-width:980px}
-  .addon-item{border:1px solid #ddd;padding:10px;border-radius:6px;display:flex;align-items:center;justify-content:space-between}
-  .meta{font-size:0.9rem;color:#444}
-  .badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:0.75rem;margin-left:8px}
+  :root{--bg:#fff;--border:#ddd;--muted:#666}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:20px;background:var(--bg);color:#111}
+  header{margin-bottom:18px}
+  h1{font-size:1.25rem;margin:0 0 6px 0}
+  p.lead{margin:0;color:var(--muted);font-size:0.95rem}
+  .controls{margin:14px 0}
+  .search{padding:8px;border:1px solid #ccc;border-radius:6px;width:360px}
+  .addons-list{display:flex;flex-direction:column;gap:8px;max-width:1100px;margin-top:8px}
+  .addon-item{border:1px solid var(--border);padding:10px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;background:#fafafa}
+  .left{display:flex;flex-direction:column;gap:6px}
+  .addon-name{font-weight:700}
+  .meta{font-size:0.9rem;color:var(--muted)}
+  .filename{font-family:monospace;color:#222}
+  .right{display:flex;align-items:center;gap:10px}
+  .download-link{padding:6px 10px;border-radius:6px;background:#0b63d0;color:#fff;text-decoration:none;font-size:0.9rem}
+  .badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:0.75rem;margin-left:8px}
   .badge.video{background:#e6f0ff;color:#0b57d0}
-  .badge.audio{background:#fff0e6;color:#d05a00}
-  .badge.program{background:#f0f7e6;color:#3a7a00}
+  .badge.audio{background:#fff6e6;color:#d05a00}
+  .badge.program{background:#f0f7e6;color:#2f7a00}
   .badge.image{background:#f6e6ff;color:#6a2fb0}
   .badge.service{background:#eef6f6;color:#0a6b6b}
   .badge.other{background:#f8e6e6;color:#b00000}
-  .filename{font-family:monospace;color:#222}
-  .missing{color:#b00;font-weight:600;margin-left:10px}
-  .controls{margin-bottom:12px}
-  .search{padding:6px;border:1px solid #ccc;border-radius:6px;width:320px}
+  .hidden{display:none}
+  a.inline{color:#0b63d0;text-decoration:none}
 </style>
 </head>
 <body>
 <header>
   <h1>vmod.open.repo — Addon Listing</h1>
-  <p class="meta">Die Kategorie wird aus dem ZIP‑Dateinamen abgeleitet (z. B. <code>plugin.video.*</code>, <code>plugin.audio.*</code>, <code>plugin.program.*</code>).</p>
+  <p class="lead">Kategorien werden aus den ZIP‑Dateinamen abgeleitet. Klicke auf einen Addon‑Namen, um die Versionsliste auf <code>addon.html</code> anzuzeigen.</p>
 </header>
 
 <div class="controls">
   <input id="filter" class="search" placeholder="Filter (Name, Kategorie) eingeben">
 </div>
 
-<main id="main">
-  <section id="addons" class="addons-list" aria-live="polite">
-    <!-- Beispiel‑Einträge: ersetze oder erweitere diese Liste durch deine tatsächlichen Links/Einträge -->
-    <article class="addon-item" data-filename="plugin.audio.mixcloud-420.3.0.2.zip" data-id="plugin.audio.mixcloud">
-      <div>
-        <div class="title"><strong class="addon-name">plugin.audio.mixcloud</strong></div>
-        <div class="meta filename">plugin.audio.mixcloud-420.3.0.2.zip</div>
-      </div>
-      <div class="right">
-        <a class="download-link" href="releases/plugin.audio.mixcloud-420.3.0.2.zip" download>Download</a>
-      </div>
-    </article>
-
-    <article class="addon-item" data-filename="plugin.video.MetalOnMetal-1.0.14.zip" data-id="plugin.video.metalonmetal">
-      <div>
-        <div class="title"><strong class="addon-name">plugin.video.MetalOnMetal</strong></div>
-        <div class="meta filename">plugin.video.MetalOnMetal-1.0.14.zip</div>
-      </div>
-      <div class="right">
-        <a class="download-link" href="releases/plugin.video.MetalOnMetal-1.0.14.zip" download>Download</a>
-      </div>
-    </article>
-
-    <article class="addon-item" data-filename="plugin.close.kodi-3.1.3.zip" data-id="plugin.close.kodi">
-      <div>
-        <div class="title"><strong class="addon-name">plugin.close.kodi</strong></div>
-        <div class="meta filename">plugin.close.kodi-3.1.3.zip</div>
-      </div>
-      <div class="right">
-        <a class="download-link" href="releases/plugin.close.kodi-3.1.3.zip" download>Download</a>
-      </div>
-    </article>
-
-    <!-- Weitere Einträge: du kannst die Liste erweitern oder durch serverseitiges Rendering ersetzen -->
-  </section>
+<main>
+  <section id="addons" class="addons-list" aria-live="polite"></section>
 </main>
 
 <script>
-/* Deterministische Kategorisierung aus Dateiname/ID.
-   Regeln (Priorität): video → audio → program → image → service → other
-   Keine Änderungen an Serverdateien; DOM‑Attribute werden gesetzt und sichtbar gemacht.
-*/
-(function(){
-  function stripBOM(s){ return (s||'').toString().replace(/^\uFEFF/, ''); }
-  function norm(s){ return stripBOM(s).toString().trim().toLowerCase(); }
+/* Vollständige ZIP‑Liste (aus deinem Ausschnitt) */
+const ZIP_LIST = [
+"plugin.audio.mixcloud-420.3.0.2.zip",
+"plugin.audio.mixcloud-420.3.0.4.zip",
+"plugin.audio.mp3streams-2025.0.1.zip",
+"plugin.audio.radio_de_light-1.0.2.zip",
+"plugin.close.kodi-3.1.3.zip",
+"plugin.close.kodi-3.1.4.zip",
+"plugin.image.pdfreader-2.0.3.zip",
+"plugin.program.autoenabler-1.0.0.zip",
+"plugin.program.autoenabler-1.0.1.zip",
+"plugin.program.browser.launcher-2.0.0-Mod Kodi-19.zip",
+"plugin.program.flowfavmanager-1.0.1.zip",
+"plugin.program.orderfavourites-1.2.2a.zip",
+"plugin.program.orderfavourites-1.2.3a.zip",
+"plugin.program.simple.favourites-0.1.27d.zip",
+"plugin.program.super.favourites-8888.w.zip",
+"plugin.video.MetalOnMetal-1.0.14.zip",
+"plugin.video.MusicHall-1.0.20.zip",
+"plugin.video.cb20-2.2.5.zip",
+"plugin.video.chaturbate-2.4.5.zip",
+"plugin.video.duffyou-0.2.1.zip",
+"plugin.video.empflix-2.1.1.zip",
+"plugin.video.f4mTester-4.0.8a.zip",
+"plugin.video.f4mTester-4.1.0w.zip",
+"plugin.video.fantasticc-2.4.1.zip",
+"plugin.video.hdtrailers_net-2.0.1.zip",
+"plugin.video.hdtrailers_net.reloaded-1.0.1.zip",
+"plugin.video.liveTv.zip",
+"plugin.video.macvod-1.96.zip",
+"plugin.video.macvod-1.96e.zip",
+"plugin.video.macvod-1.98.zip",
+"plugin.video.macvod-1.991.zip",
+"plugin.video.macvod-1.993.zip",
+"plugin.video.macvod-1.995.zip",
+"plugin.video.megakino-2.0.3.zip",
+"plugin.video.next-2024.zip",
+"plugin.video.now_music-5.6.8.zip",
+"plugin.video.now_music-9.0.1.zip",
+"plugin.video.playlistloader-1.0.3g+matrix.zip",
+"plugin.video.playlistloader-1.1.4.zip",
+"plugin.video.playlistloader-1.1.6.zip",
+"plugin.video.playlistloader-1.1.7.zip",
+"plugin.video.playlistloader-1.1.8.zip",
+"plugin.video.sportliveevents-1.12a.zip",
+"plugin.video.sportscentral-0.1.5.zip",
+"plugin.video.sportstreams-1.1.4.zip",
+"plugin.video.stalker-2.2.0a.zip",
+"plugin.video.stalker-2.2.0b.zip",
+"plugin.video.stalker-2.2.0ba.zip",
+"plugin.video.stalker-2.2.0c.zip",
+"plugin.video.stalkermod-1.0.1.zip",
+"plugin.video.stalkervod-0.0.7.zip",
+"plugin.video.stbplus-2026.02.19.zip",
+"plugin.video.tvlive-3.1.2.zip",
+"plugin.video.tvone-26+matrix.1w.zip",
+"plugin.video.tvone-26+matrix.2w.zip",
+"plugin.video.tvone-27+matrix.1w.zip",
+"plugin.video.tvone-27+matrix.2w.zip",
+"plugin.video.tvone11-28+matrix.1w.zip",
+"plugin.video.tvone111-24+matrix.1wa.zip",
+"plugin.video.tvone111-25+matrix.1.zip",
+"plugin.video.tvone111-25+matrix.1w.zip",
+"plugin.video.tvone111-26+matrix.1w.zip",
+"plugin.video.tvone1111-111+matrix.1w.zip",
+"plugin.video.tvone1111-112+matrix.1w.zip",
+"plugin.video.tvone1112-111+matrix.1.zip",
+"plugin.video.tvone1112-112+matrix.1w.zip",
+"plugin.video.tvone112-1+matrix.1w.zip",
+"plugin.video.tvone112-2+matrix.1w.zip",
+"plugin.video.tvone112-3+matrix.1w.zip",
+"plugin.video.vav-3.1.zip",
+"plugin.video.vavooto-2026.03.02.zip",
+"plugin.video.vtv.live-1.2.1.zip",
+"plugin.video.xship-2026.03.01.zip",
+"repository.flowfavmanager-1.0.0.zip",
+"repository.jurialmunkey.zip",
+"repository.kodi.media-1.0.0.zip",
+"repository.michaz-5.0.zip",
+"repository.seizu-1.7.12.zip",
+"script.favourites-8.1.2.zip",
+"script.module.addon.common-2.0.0.zip",
+"script.module.beautifulsoup-3.2.1.zip",
+"script.module.cloudscraper-1.2.66.zip",
+"script.module.futures-2.2.0.zip",
+"script.module.liveresolver-0.1.50.zip",
+"script.module.metahandler-3.0.2.zip",
+"script.module.parsedom-2.5.2.zip",
+"script.module.resolveurl.xxx-2.1.31.zip",
+"script.module.routing-0.2.3.1.zip",
+"script.module.singledispatch-3.4.0.3.zip",
+"script.module.slproxy-1.0.0.zip",
+"script.module.t0mm0.common-2.1.1.zip",
+"script.module.t0mm0.common-3.0.1.zip",
+"script.module.thetvdb.helper.zip",
+"script.module.tzlocal-5.0.1.zip",
+"script.module.websocket-0.58.0+matrix.2.zip",
+"script.sites-19.5e.zip",
+"script.video.F4mProxy-4.0.9a.zip",
+"script.video.F4mProxy-4.0.9b.zip",
+"service.autoexec-1.0.0.zip",
+"service.autohideosd-1.0.0.zip",
+"service.subtitles.all_subs_plus-2.3.zip"
+];
 
-  var rules = [
-    {re: /plugin[\._-]?video|(^|[^a-z0-9])video([^a-z0-9]|$)/i, cat:'video'},
-    {re: /plugin[\._-]?(audio|music)|(^|[^a-z0-9])(audio|music)([^a-z0-9]|$)/i, cat:'audio'},
-    {re: /plugin[\._-]?program|(^|[^a-z0-9])program([^a-z0-9]|$)|\bscript\b/i, cat:'program'},
-    {re: /plugin[\._-]?image|image|pdfreader|picture|gallery|skin/i, cat:'image'},
-    {re: /\bservice\b|\bdaemon\b/i, cat:'service'}
-  ];
+/* Deterministische Kategorisierung (Priorität video→audio→program→image→service→other) */
+function norm(s){ return (s||'').toString().replace(/^\uFEFF/,'').trim().toLowerCase(); }
+function inferCategory(text){
+  const t = norm(text);
+  if(/plugin[\._-]?video|(^|[^a-z0-9])video([^a-z0-9]|$)/i.test(t)) return 'video';
+  if(/plugin[\._-]?(audio|music)|(^|[^a-z0-9])(audio|music)([^a-z0-9]|$)/i.test(t)) return 'audio';
+  if(/plugin[\._-]?program|(^|[^a-z0-9])program([^a-z0-9]|$)|\bscript\b/i.test(t)) return 'program';
+  if(/plugin[\._-]?image|image|pdfreader|picture|gallery|skin/i.test(t)) return 'image';
+  if(/\bservice\b|\bdaemon\b/i.test(t)) return 'service';
+  return 'other';
+}
 
-  function inferCategory(s){
-    var t = norm(s);
-    for(var i=0;i<rules.length;i++){
-      if(rules[i].re.test(t)) return rules[i].cat;
-    }
-    return 'other';
+/* Erzeuge ID (Basis ohne Versionssuffix) */
+function deriveId(filename){
+  let base = filename.replace(/\.zip$/i,'');
+  // Entferne bekannte Version‑Suffixe: -digit oder -digit... oder -YYYY.MM.DD etc.
+  // Suche das erste '-' gefolgt von einer Zahl oder ein typisches version pattern
+  const m = base.match(/^(.*?)(-\d[\w\.\+\-]*.*)$/);
+  if(m) return m[1];
+  // Falls kein match, fallback: entferne trailing .zip already done
+  return base;
+}
+
+/* Baue Map id -> versions */
+function buildMap(list){
+  const map = new Map();
+  list.forEach(fn=>{
+    const id = deriveId(fn);
+    const name = id;
+    const cat = inferCategory(fn + ' ' + id);
+    if(!map.has(id)) map.set(id, []);
+    map.get(id).push({filename: fn, id, name, category: cat});
+  });
+  // Sortiere Versionen lexikographisch (stabil)
+  for(const [k,arr] of map.entries()){
+    arr.sort((a,b)=> a.filename.localeCompare(b.filename));
   }
+  return map;
+}
 
-  function applyBadges(item, cat){
-    var existing = item.querySelector('.badge');
-    if(existing) existing.remove();
-    var span = document.createElement('span');
-    span.className = 'badge ' + cat;
-    span.textContent = cat;
-    item.querySelector('.title').appendChild(span);
-    if(cat === 'other'){
-      var m = item.querySelector('.missing');
-      if(!m){
-        var miss = document.createElement('span');
-        miss.className = 'missing';
-        miss.textContent = 'unbestimmte Kategorie';
-        item.querySelector('.meta').appendChild(miss);
-      }
-    }
-  }
+/* Render */
+function render(){
+  const container = document.getElementById('addons');
+  container.innerHTML = '';
+  const map = buildMap(ZIP_LIST);
+  const ids = Array.from(map.keys()).sort((a,b)=> a.localeCompare(b));
+  ids.forEach(id=>{
+    const versions = map.get(id);
+    // Für jede Version eine Zeile (Versionen verlinken auf addon.html?id=ID)
+    versions.forEach(v=>{
+      const art = document.createElement('article');
+      art.className = 'addon-item';
+      art.setAttribute('data-id', v.id);
+      art.setAttribute('data-name', v.name);
+      art.setAttribute('data-filename', v.filename);
+      art.setAttribute('data-provides', v.category);
 
-  function normalizeName(item){
-    var nameEl = item.querySelector('.addon-name');
-    if(nameEl) nameEl.textContent = stripBOM(nameEl.textContent).trim();
-    else {
-      var id = item.getAttribute('data-id') || '';
-      item.setAttribute('data-name', id || '');
-    }
-  }
+      const left = document.createElement('div'); left.className='left';
+      const titleLine = document.createElement('div');
+      const nameEl = document.createElement('span'); nameEl.className='addon-name';
+      nameEl.textContent = v.name;
+      const badge = document.createElement('span'); badge.className = 'badge ' + v.category;
+      badge.textContent = v.category;
+      titleLine.appendChild(nameEl);
+      titleLine.appendChild(badge);
 
-  function processAll(){
-    var container = document.getElementById('addons');
-    var items = Array.from(container.querySelectorAll('.addon-item'));
-    items.forEach(function(it){
-      normalizeName(it);
-      var filename = it.getAttribute('data-filename') || (it.querySelector('.filename') && it.querySelector('.filename').textContent) || '';
-      var id = it.getAttribute('data-id') || '';
-      var prov = it.getAttribute('data-provides') || '';
-      prov = norm(prov);
-      if(!prov){
-        prov = inferCategory(id || filename || it.textContent || '');
-        it.classList.add('inferred-provides');
-      }
-      it.setAttribute('data-provides', prov);
-      var name = it.getAttribute('data-name') || (it.querySelector('.addon-name') && it.querySelector('.addon-name').textContent) || '';
-      it.setAttribute('data-name', name);
-      applyBadges(it, prov);
-    });
+      const meta = document.createElement('div'); meta.className='meta filename';
+      meta.textContent = v.filename;
 
-    // stabile Sortierung: name -> id
-    items.sort(function(a,b){
-      var na = (a.getAttribute('data-name')||'').toLowerCase();
-      var nb = (b.getAttribute('data-name')||'').toLowerCase();
-      if(na === nb) return (a.getAttribute('data-id')||'').localeCompare(b.getAttribute('data-id')||'');
-      return na.localeCompare(nb);
-    });
-    items.forEach(function(i){ container.appendChild(i); });
-  }
+      left.appendChild(titleLine);
+      left.appendChild(meta);
 
-  document.addEventListener('DOMContentLoaded', function(){
-    processAll();
-    // Filter input
-    var filter = document.getElementById('filter');
-    filter.addEventListener('input', function(){
-      var q = norm(this.value);
-      var items = Array.from(document.querySelectorAll('.addon-item'));
-      items.forEach(function(it){
-        var name = (it.getAttribute('data-name')||'') + ' ' + (it.getAttribute('data-provides')||'') + ' ' + (it.getAttribute('data-id')||'');
-        if(name.toLowerCase().indexOf(q) !== -1) it.style.display = '';
-        else it.style.display = 'none';
-      });
+      const right = document.createElement('div'); right.className='right';
+      const versionsLink = document.createElement('a'); versionsLink.className='inline';
+      versionsLink.href = 'addon.html?id=' + encodeURIComponent(v.id);
+      versionsLink.textContent = 'Versionen';
+      const dl = document.createElement('a'); dl.className='download-link';
+      dl.href = 'releases/' + encodeURIComponent(v.filename);
+      dl.setAttribute('download','');
+      dl.textContent = 'Download';
+      right.appendChild(versionsLink);
+      right.appendChild(dl);
+
+      art.appendChild(left);
+      art.appendChild(right);
+      container.appendChild(art);
     });
   });
-})();
+}
+
+/* Filter */
+document.addEventListener('DOMContentLoaded', function(){
+  render();
+  const filter = document.getElementById('filter');
+  filter.addEventListener('input', function(){
+    const q = norm(this.value);
+    const items = Array.from(document.querySelectorAll('.addon-item'));
+    items.forEach(it=>{
+      const hay = (it.getAttribute('data-name')||'') + ' ' + (it.getAttribute('data-provides')||'') + ' ' + (it.getAttribute('data-filename')||'');
+      if(q === '' || norm(hay).indexOf(q) !== -1) it.classList.remove('hidden');
+      else it.classList.add('hidden');
+    });
+  });
+});
 </script>
 </body>
 </html>
