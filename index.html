@@ -47,44 +47,67 @@
     }
 
     .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        display: flex;
+        flex-direction: column;
         gap: 20px;
         padding: 20px;
     }
 
     .addon {
+        display: flex;
         background: #1a1a1a;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 15px;
-        text-align: center;
-        transition: transform 0.2s, box-shadow 0.2s;
         border: 1px solid #0bb4a2;
         cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 180px;
     }
 
     .addon:hover {
-        transform: scale(1.05);
+        transform: scale(1.02);
         box-shadow: 0 0 15px #0bb4a2;
     }
 
     .addon img {
-        width: 120px;
-        height: 120px;
+        width: 160px;
+        height: 160px;
         object-fit: contain;
-        margin-bottom: 10px;
+        border-radius: 10px;
+        background: #00000033;
+        padding: 10px;
+    }
+
+    .addon-info {
+        flex: 1;
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .addon-title {
-        font-size: 18px;
+        font-size: 24px;
         font-weight: bold;
         color: #0bb4a2;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .addon-desc {
+        font-size: 14px;
+        color: #ccc;
+        height: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .addon-category {
+        margin-top: 10px;
         font-size: 14px;
-        color: #aaa;
+        color: #888;
     }
 </style>
 </head>
@@ -104,6 +127,10 @@
 
 <script>
 let addonsById = {};
+
+function shorten(text, max = 40) {
+    return text.length > max ? text.substring(0, max) + "…" : text;
+}
 
 async function loadAddons() {
     const response = await fetch("addons.xml");
@@ -173,8 +200,11 @@ function renderAddons() {
 
         card.innerHTML = `
             <img src="${addon.icon}">
-            <div class="addon-title">${addon.name}</div>
-            <div class="addon-category">${addon.category}</div>
+            <div class="addon-info">
+                <div class="addon-title">${shorten(addon.name, 40)}</div>
+                <div class="addon-desc">${shorten(addon.desc, 120)}</div>
+                <div class="addon-category">${addon.category}</div>
+            </div>
         `;
 
         grid.appendChild(card);
