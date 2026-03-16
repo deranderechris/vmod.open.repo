@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Addon Details</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        margin: 0;
+        background: #0d0d0d;
+        font-family: Arial, sans-serif;
+        color: #e0e0e0;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #0bb4a2, #066f66);
+        padding: 40px 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        color: #fff;
+    }
+
+    .header img {
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        object-fit: contain;
+        background: #00000033;
+        padding: 10px;
+    }
+
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .category {
+        font-size: 16px;
+        opacity: 0.8;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .desc {
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: #ccc;
+    }
+
+    .versions {
+        background: #1a1a1a;
+        border: 1px solid #0bb4a2;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .versions h2 {
+        margin-top: 0;
+        color: #0bb4a2;
+    }
+
+    .version-item {
+        margin-bottom: 10px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 8px 12px;
+        background: #0bb4a2;
+        color: #000;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="header" class="header"></div>
+
+<div class="content">
+    <div id="desc" class="desc"></div>
+
+    <div class="versions">
+        <h2>Versionen</h2>
+        <div id="versionList"></div>
+    </div>
+</div>
+
+<script>
+async function loadAddon() {
+    const params = new URLSearchParams(window.location.search);
+    const addonId = params.get("id");
+
+    const response = await fetch("addons.xml");
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "text/xml");
+
+    const addons = xml.getElementsByTagName("addon");
+
+    let addonData = {
+        id: addonId,
+        name: addonId,
+        desc: "",
+        icon: "icon.png",
+        category: "Sonstiges",
+        versions: []
+    };
+
+    for (let addon of addons) {
+        if (addon.getAttribute("id") !== addonId) continue;
+
+        const version = addon.getAttribute("version");
+        const name = addon.getElementsByTagName("name")[0]?.textContent || addonId;
+        const desc = addon.getElementsByTagName("description")[0]?.textContent || "";
+        const icon = addon.getElementsByTagName("icon")[0]?.textContent || "icon.png";
+
+        let category = "Sonstiges";
+        const ext = addon.getElementsByTagName("extension")[0];
+        if (ext) {
+            const point = ext.getAttribute("point") || "";
+            if (point.includes("video")) category = "Video";
+            else if (point.includes("audio")) category = "Audio";
+            else if (point.includes("program")) category = "Programme";
+            else if (point.includes("skin")) category = "Skins";
+            else if (point.includes("repository")) category = "Repository";
+        }
+
+        addonData.name = name;
+        addonData.desc = desc;
+        addonData.icon = icon;
+        addonData.category = category;
+        addonData.versions.push(version);
+    }
+
+    addonData.versions.sort((a, b) => b.localeCompare(a));
+
+    document.getElementById("header").innerHTML = `
+        <img src="${addonData.icon}">
+        <div>
+            <div class="title">${addonData.name}</div>
+            <div class="category">${addonData.category}</div>
+        </div>
+    `;
+
+    document.getElementById("desc").textContent = addonData.desc;
+
+    const versionList = document.getElementById("versionList");
+    addonData.versions.forEach(v => {
+        const zip = `${addonId}-${v}.zip`;
+        versionList.innerHTML += `
+            <div class="version-item">
+                <strong>${v}</strong><br>
+                <a class="btn" href="${zip}" download>Download</a>
+            </div>
+        `;
+    });
+}
+
+loadAddon();
+</script>
+
+</body>
+</html>
