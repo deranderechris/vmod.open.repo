@@ -5,48 +5,55 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>vmod.open.repo — Addons</title>
 <style>
-  :root{--bg:#fff;--border:#ddd;--muted:#666}
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:20px;background:var(--bg);color:#111}
-  header{margin-bottom:18px}
-  h1{font-size:1.25rem;margin:0 0 6px 0}
-  p.lead{margin:0;color:var(--muted);font-size:0.95rem}
-  .controls{margin:14px 0}
-  .search{padding:8px;border:1px solid #ccc;border-radius:6px;width:360px}
-  .addons-list{display:flex;flex-direction:column;gap:8px;max-width:1100px;margin-top:8px}
-  .addon-item{border:1px solid var(--border);padding:10px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;background:#fafafa}
-  .left{display:flex;flex-direction:column;gap:6px}
-  .addon-name{font-weight:700}
-  .meta{font-size:0.9rem;color:var(--muted)}
-  .filename{font-family:monospace;color:#222}
-  .right{display:flex;align-items:center;gap:10px}
-  .download-link{padding:6px 10px;border-radius:6px;background:#0b63d0;color:#fff;text-decoration:none;font-size:0.9rem}
-  .badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:0.75rem;margin-left:8px}
-  .badge.video{background:#e6f0ff;color:#0b57d0}
-  .badge.audio{background:#fff6e6;color:#d05a00}
-  .badge.program{background:#f0f7e6;color:#2f7a00}
-  .badge.image{background:#f6e6ff;color:#6a2fb0}
-  .badge.service{background:#eef6f6;color:#0a6b6b}
-  .badge.other{background:#f8e6e6;color:#b00000}
+  :root{
+    --bg:#0b0f14; --card:#0f1720; --muted:#9aa6b2; --accent:#7dd3fc; --accent-2:#60a5fa;
+    --border:rgba(255,255,255,0.04); --glass:rgba(255,255,255,0.03);
+  }
+  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#e6eef6;background:linear-gradient(180deg,#071018 0%,var(--bg) 100%);}
+  .wrap{max-width:1200px;margin:28px auto;padding:20px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  h1{font-size:1.1rem;margin:0;font-weight:600;letter-spacing:0.2px}
+  .lead{color:var(--muted);font-size:0.92rem}
+  .controls{display:flex;gap:12px;align-items:center;margin-top:14px}
+  .search{background:var(--card);border:1px solid var(--border);padding:10px 12px;border-radius:10px;color:inherit;min-width:320px}
+  .repo-zip{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#04263b;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:700;box-shadow:0 6px 18px rgba(96,165,250,0.08)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-top:18px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),var(--glass));border:1px solid var(--border);padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:8px}
+  .title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .addon-name{font-weight:600;color:#eaf6ff;word-break:break-all}
+  .badge{font-size:0.75rem;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+  .filename{font-family:ui-monospace,monospace;color:var(--muted);font-size:0.86rem}
+  .row-actions{display:flex;gap:8px;align-items:center}
+  .link{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--accent);text-decoration:none;font-weight:600}
+  .download{background:rgba(125,211,252,0.12);border:1px solid rgba(125,211,252,0.12);padding:8px 10px;border-radius:8px;color:var(--accent);text-decoration:none;font-weight:700}
+  .muted{color:var(--muted);font-size:0.85rem}
+  .small{font-size:0.82rem;color:var(--muted)}
   .hidden{display:none}
-  a.inline{color:#0b63d0;text-decoration:none}
+  @media (max-width:520px){ .controls{flex-direction:column;align-items:stretch} .search{width:100%} }
 </style>
 </head>
 <body>
-<header>
-  <h1>vmod.open.repo — Addon Listing</h1>
-  <p class="lead">Kategorien werden aus den ZIP‑Dateinamen abgeleitet. Klicke auf einen Addon‑Namen, um die Versionsliste auf <code>addon.html</code> anzuzeigen.</p>
-</header>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>vmod.open.repo — Addons</h1>
+      <div class="lead">Dunkles, modernes Listing. Klick auf einen Addon‑Namen für Versionen.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <a class="repo-zip" href="releases/repo.zip" download>Repo ZIP herunterladen</a>
+      <div class="small">Letzte Aktualisierung: manuell</div>
+    </div>
+  </header>
 
-<div class="controls">
-  <input id="filter" class="search" placeholder="Filter (Name, Kategorie) eingeben">
+  <div class="controls">
+    <input id="filter" class="search" placeholder="Filter (Name, Kategorie, Dateiname)">
+  </div>
+
+  <section id="list" class="grid" aria-live="polite"></section>
 </div>
 
-<main>
-  <section id="addons" class="addons-list" aria-live="polite"></section>
-</main>
-
 <script>
-/* Vollständige ZIP‑Liste (aus deinem Ausschnitt) */
+/* ZIP_LIST: füge hier die vollständige Liste ein (oder lade dynamisch) */
 const ZIP_LIST = [
 "plugin.audio.mixcloud-420.3.0.2.zip",
 "plugin.audio.mixcloud-420.3.0.4.zip",
@@ -151,107 +158,61 @@ const ZIP_LIST = [
 "service.subtitles.all_subs_plus-2.3.zip"
 ];
 
-/* Deterministische Kategorisierung (Priorität video→audio→program→image→service→other) */
-function norm(s){ return (s||'').toString().replace(/^\uFEFF/,'').trim().toLowerCase(); }
-function inferCategory(text){
-  const t = norm(text);
-  if(/plugin[\._-]?video|(^|[^a-z0-9])video([^a-z0-9]|$)/i.test(t)) return 'video';
-  if(/plugin[\._-]?(audio|music)|(^|[^a-z0-9])(audio|music)([^a-z0-9]|$)/i.test(t)) return 'audio';
-  if(/plugin[\._-]?program|(^|[^a-z0-9])program([^a-z0-9]|$)|\bscript\b/i.test(t)) return 'program';
-  if(/plugin[\._-]?image|image|pdfreader|picture|gallery|skin/i.test(t)) return 'image';
-  if(/\bservice\b|\bdaemon\b/i.test(t)) return 'service';
+function inferCategory(s){
+  const t = (s||'').toLowerCase();
+  if(/plugin[\._-]?video|[^a-z]video[^a-z]/.test(t)) return 'video';
+  if(/plugin[\._-]?(audio|music)/.test(t)) return 'audio';
+  if(/plugin[\._-]?program|script\./.test(t)) return 'program';
+  if(/plugin[\._-]?image|pdfreader|gallery/.test(t)) return 'image';
+  if(/service\./.test(t)) return 'service';
   return 'other';
 }
-
-/* Erzeuge ID (Basis ohne Versionssuffix) */
-function deriveId(filename){
-  let base = filename.replace(/\.zip$/i,'');
-  // Entferne bekannte Version‑Suffixe: -digit oder -digit... oder -YYYY.MM.DD etc.
-  // Suche das erste '-' gefolgt von einer Zahl oder ein typisches version pattern
-  const m = base.match(/^(.*?)(-\d[\w\.\+\-]*.*)$/);
-  if(m) return m[1];
-  // Falls kein match, fallback: entferne trailing .zip already done
-  return base;
+function deriveId(fn){
+  const base = fn.replace(/\.zip$/i,'');
+  const m = base.match(/^(.*?)(-\d[\w\.\+\-].*)$/);
+  return m ? m[1] : base;
 }
 
-/* Baue Map id -> versions */
-function buildMap(list){
+function render(){
+  const container = document.getElementById('list');
   const map = new Map();
-  list.forEach(fn=>{
+  ZIP_LIST.forEach(fn=>{
     const id = deriveId(fn);
-    const name = id;
     const cat = inferCategory(fn + ' ' + id);
     if(!map.has(id)) map.set(id, []);
-    map.get(id).push({filename: fn, id, name, category: cat});
+    map.get(id).push({filename:fn, id, category:cat});
   });
-  // Sortiere Versionen lexikographisch (stabil)
-  for(const [k,arr] of map.entries()){
-    arr.sort((a,b)=> a.filename.localeCompare(b.filename));
-  }
-  return map;
-}
-
-/* Render */
-function render(){
-  const container = document.getElementById('addons');
-  container.innerHTML = '';
-  const map = buildMap(ZIP_LIST);
   const ids = Array.from(map.keys()).sort((a,b)=> a.localeCompare(b));
   ids.forEach(id=>{
-    const versions = map.get(id);
-    // Für jede Version eine Zeile (Versionen verlinken auf addon.html?id=ID)
+    const versions = map.get(id).sort((a,b)=> a.filename.localeCompare(b.filename));
     versions.forEach(v=>{
-      const art = document.createElement('article');
-      art.className = 'addon-item';
-      art.setAttribute('data-id', v.id);
-      art.setAttribute('data-name', v.name);
-      art.setAttribute('data-filename', v.filename);
-      art.setAttribute('data-provides', v.category);
-
-      const left = document.createElement('div'); left.className='left';
-      const titleLine = document.createElement('div');
-      const nameEl = document.createElement('span'); nameEl.className='addon-name';
-      nameEl.textContent = v.name;
-      const badge = document.createElement('span'); badge.className = 'badge ' + v.category;
-      badge.textContent = v.category;
-      titleLine.appendChild(nameEl);
-      titleLine.appendChild(badge);
-
-      const meta = document.createElement('div'); meta.className='meta filename';
-      meta.textContent = v.filename;
-
-      left.appendChild(titleLine);
-      left.appendChild(meta);
-
-      const right = document.createElement('div'); right.className='right';
-      const versionsLink = document.createElement('a'); versionsLink.className='inline';
-      versionsLink.href = 'addon.html?id=' + encodeURIComponent(v.id);
-      versionsLink.textContent = 'Versionen';
-      const dl = document.createElement('a'); dl.className='download-link';
-      dl.href = 'releases/' + encodeURIComponent(v.filename);
-      dl.setAttribute('download','');
-      dl.textContent = 'Download';
-      right.appendChild(versionsLink);
-      right.appendChild(dl);
-
-      art.appendChild(left);
-      art.appendChild(right);
-      container.appendChild(art);
+      const card = document.createElement('div'); card.className='card';
+      card.innerHTML = `
+        <div class="title-row">
+          <div style="min-width:0">
+            <div class="addon-name">${v.id}</div>
+            <div class="filename">${v.filename}</div>
+          </div>
+          <div class="row-actions">
+            <a class="link" href="addon.html?id=${encodeURIComponent(v.id)}">Versionen</a>
+            <a class="download" href="releases/${encodeURIComponent(v.filename)}" download>Download</a>
+          </div>
+        </div>
+        <div class="small muted">Kategorie: ${v.category}</div>
+      `;
+      container.appendChild(card);
     });
   });
 }
 
-/* Filter */
 document.addEventListener('DOMContentLoaded', function(){
   render();
   const filter = document.getElementById('filter');
   filter.addEventListener('input', function(){
-    const q = norm(this.value);
-    const items = Array.from(document.querySelectorAll('.addon-item'));
-    items.forEach(it=>{
-      const hay = (it.getAttribute('data-name')||'') + ' ' + (it.getAttribute('data-provides')||'') + ' ' + (it.getAttribute('data-filename')||'');
-      if(q === '' || norm(hay).indexOf(q) !== -1) it.classList.remove('hidden');
-      else it.classList.add('hidden');
+    const q = (this.value||'').toLowerCase();
+    document.querySelectorAll('.card').forEach(card=>{
+      const text = card.textContent.toLowerCase();
+      card.style.display = q === '' || text.indexOf(q) !== -1 ? '' : 'none';
     });
   });
 });
