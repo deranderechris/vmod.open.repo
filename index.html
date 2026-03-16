@@ -1,4 +1,4 @@
-<!-- rebuild3 -->
+<!-- rebuild5 -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -11,17 +11,17 @@
         margin: 0;
         background: #0d0d0d;
         font-family: Arial, sans-serif;
-        color: #e0e0e0;
+        color: #ffffff;
     }
 
     header {
         padding: 20px;
         text-align: center;
         background: #111;
-        border-bottom: 2px solid #0bb4a2;
+        border-bottom: 2px solid #333;
         font-size: 28px;
         font-weight: bold;
-        color: #0bb4a2;
+        color: #ffffff;
     }
 
     #controls {
@@ -34,80 +34,58 @@
 
     select, input {
         padding: 10px;
-        border-radius: 8px;
+        border-radius: 6px;
         border: none;
         background: #1a1a1a;
-        color: #e0e0e0;
-        outline: 2px solid #0bb4a2;
+        color: #ffffff;
+        outline: 1px solid #444;
         font-size: 15px;
     }
 
     #search {
-        width: 250px;
+        width: 260px;
     }
 
-    .grid {
+    .list {
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        padding: 20px;
+        gap: 12px;
     }
 
     .addon {
-        display: flex;
         background: #1a1a1a;
-        border-radius: 12px;
+        border: 1px solid #333;
+        border-radius: 6px;
         padding: 15px;
-        border: 1px solid #0bb4a2;
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        height: 180px;
+        transition: background 0.2s;
     }
 
     .addon:hover {
-        transform: scale(1.02);
-        box-shadow: 0 0 15px #0bb4a2;
-    }
-
-    .addon img {
-        width: 160px;
-        height: 160px;
-        object-fit: contain;
-        border-radius: 10px;
-        background: #00000033;
-        padding: 10px;
-    }
-
-    .addon-info {
-        flex: 1;
-        padding-left: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        background: #222;
     }
 
     .addon-title {
-        font-size: 24px;
+        font-size: 20px;
         font-weight: bold;
-        color: #0bb4a2;
-        margin-bottom: 8px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .addon-desc {
-        font-size: 14px;
-        color: #ccc;
-        height: 40px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        color: #ffffff;
+        display: flex;
+        justify-content: space-between;
     }
 
     .addon-category {
-        margin-top: 10px;
         font-size: 14px;
         color: #888;
+    }
+
+    .addon-desc {
+        margin-top: 6px;
+        font-size: 14px;
+        color: #cccccc;
+        max-height: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>
 </head>
@@ -123,12 +101,12 @@
     </select>
 </div>
 
-<div class="grid" id="addonGrid"></div>
+<div class="list" id="addonList"></div>
 
 <script>
 let addonsById = {};
 
-function shorten(text, max = 40) {
+function shorten(text, max = 80) {
     return text.length > max ? text.substring(0, max) + "…" : text;
 }
 
@@ -146,7 +124,6 @@ async function loadAddons() {
         const version = addon.getAttribute("version");
         const name = addon.getElementsByTagName("name")[0]?.textContent || id;
         const desc = addon.getElementsByTagName("description")[0]?.textContent || "";
-        const icon = addon.getElementsByTagName("icon")[0]?.textContent || "icon.png";
 
         let category = "Sonstiges";
         const ext = addon.getElementsByTagName("extension")[0];
@@ -163,15 +140,19 @@ async function loadAddons() {
 
         if (!addonsById[id]) {
             addonsById[id] = {
-                id, name, desc, icon, category, versions: []
+                id, name, desc, category, versions: []
             };
         }
 
         addonsById[id].versions.push(version);
     }
 
+    const sortedCats = Array.from(categories).sort();
+
     const catSelect = document.getElementById("categoryFilter");
-    categories.forEach(cat => {
+    catSelect.innerHTML = `<option value="all">Alle Kategorien</option>`;
+
+    sortedCats.forEach(cat => {
         const opt = document.createElement("option");
         opt.value = cat;
         opt.textContent = cat;
@@ -182,8 +163,8 @@ async function loadAddons() {
 }
 
 function renderAddons() {
-    const grid = document.getElementById("addonGrid");
-    grid.innerHTML = "";
+    const list = document.getElementById("addonList");
+    list.innerHTML = "";
 
     const searchTerm = document.getElementById("search").value.toLowerCase();
     const selectedCat = document.getElementById("categoryFilter").value;
@@ -192,22 +173,21 @@ function renderAddons() {
         if (!addon.name.toLowerCase().includes(searchTerm)) return;
         if (selectedCat !== "all" && addon.category !== selectedCat) return;
 
-        const card = document.createElement("div");
-        card.className = "addon";
-        card.onclick = () => {
+        const row = document.createElement("div");
+        row.className = "addon";
+        row.onclick = () => {
             window.location.href = `addon.html?id=${addon.id}`;
         };
 
-        card.innerHTML = `
-            <img src="${addon.icon}">
-            <div class="addon-info">
-                <div class="addon-title">${shorten(addon.name, 40)}</div>
-                <div class="addon-desc">${shorten(addon.desc, 120)}</div>
-                <div class="addon-category">${addon.category}</div>
+        row.innerHTML = `
+            <div class="addon-title">
+                <span>${shorten(addon.name, 60)}</span>
+                <span class="addon-category">${addon.category}</span>
             </div>
+            <div class="addon-desc">${shorten(addon.desc, 160)}</div>
         `;
 
-        grid.appendChild(card);
+        list.appendChild(row);
     });
 }
 
