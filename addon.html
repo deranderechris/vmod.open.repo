@@ -1,9 +1,8 @@
-<!-- rebuild-addon3 -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>D.A. Offene Kodi Repo</title>
+<title>Addon Details</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -19,7 +18,7 @@
         text-align: center;
         background: #111;
         border-bottom: 2px solid #333;
-        font-size: 26px;
+        font-size: 24px;
         font-weight: bold;
     }
 
@@ -29,64 +28,54 @@
         margin: auto;
     }
 
-    .desc {
-        margin-top: 10px;
-        color: #cccccc;
-        font-size: 15px;
-        line-height: 1.5;
-    }
-
-    .category {
-        margin-top: 5px;
-        color: #888;
-        font-size: 14px;
-    }
-
-    .versions-title {
-        margin-top: 30px;
-        font-size: 20px;
-        font-weight: bold;
-        border-bottom: 1px solid #333;
-        padding-bottom: 8px;
-    }
-
-    .version {
+    .section {
         background: #1a1a1a;
         border: 1px solid #333;
         border-radius: 6px;
         padding: 15px;
         margin-top: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
     }
 
-    .version span {
-        font-size: 16px;
-        color: #ffffff;
+    .title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #fff;
     }
 
-    .download-btn {
-        padding: 8px 14px;
+    .label {
+        font-size: 14px;
+        color: #888;
+        margin-top: 6px;
+    }
+
+    .desc {
+        font-size: 14px;
+        color: #ccc;
+        margin-top: 10px;
+        line-height: 1.4;
+    }
+
+    .download {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 14px;
         background: #333;
-        color: #ffffff;
+        color: #fff;
         border-radius: 5px;
         text-decoration: none;
         font-size: 14px;
-        border: 1px solid #444;
-        transition: background 0.2s;
     }
 
-    .download-btn:hover {
-        background: #444;
+    .download:hover {
+        background: #555;
     }
 
     .back {
-        margin-top: 25px;
         display: inline-block;
+        margin-top: 20px;
         color: #aaa;
-        font-size: 14px;
         text-decoration: none;
+        font-size: 14px;
     }
 
     .back:hover {
@@ -97,38 +86,24 @@
 
 <body>
 
-<header>D.A. Offene Kodi Repo</header>
+<header>Addon Details</header>
 
 <div class="container">
-    <h2 id="addonName"></h2>
-    <div class="category" id="addonCategory"></div>
-    <div class="desc" id="addonDesc"></div>
-
-    <div class="versions-title">Versionen</div>
-    <div id="versionList"></div>
-
-    <a href="index.html" class="back">← Zurück zur Übersicht</a>
+    <div id="content"></div>
+    <a class="back" href="index.html">← Zurück zur Übersicht</a>
 </div>
 
 <script>
-function shorten(text, max = 200) {
-    return text.length > max ? text.substring(0, max) + "…" : text;
-}
-
-// Nur DE → EN → Fallback
 function getBestDescription(addon) {
     const descriptions = addon.getElementsByTagName("description");
-
     let de = null, en = null, fallback = null;
 
     for (let d of descriptions) {
         const lang = d.getAttribute("lang");
-
         if (lang === "de") de = d.textContent;
         else if (lang === "en") en = d.textContent;
         else if (!lang) fallback = d.textContent;
     }
-
     return de || en || fallback || "";
 }
 
@@ -136,64 +111,59 @@ async function loadAddon() {
     const params = new URLSearchParams(window.location.search);
     const addonId = params.get("id");
 
+    if (!addonId) {
+        document.getElementById("content").innerHTML = "<p>Kein Addon angegeben.</p>";
+        return;
+    }
+
     const response = await fetch("addons.xml");
     const xmlText = await response.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(xmlText, "text/xml");
 
     const addons = xml.getElementsByTagName("addon");
-    let addonData = null;
+    let found = null;
 
     for (let addon of addons) {
         if (addon.getAttribute("id") === addonId) {
-            const name = addon.getElementsByTagName("name")[0]?.textContent || addonId;
-            const desc = getBestDescription(addon);
-
-            let category = "Sonstiges";
-            const ext = addon.getElementsByTagName("extension")[0];
-            if (ext) {
-                const point = ext.getAttribute("point") || "";
-                if (point.includes("video")) category = "Video";
-                else if (point.includes("audio")) category = "Audio";
-                else if (point.includes("program")) category = "Programm";
-                else if (point.includes("script")) category = "Script";
-                else if (point.includes("skin")) category = "Skins";
-                else if (point.includes("repository")) category = "Repository";
-            }
-
-            addonData = { name, desc, category, versions: [] };
+            found = addon;
+            break;
         }
     }
 
-    if (!addonData) return;
+    if (!found) {
+        document.getElementById("content").innerHTML = "<p>Addon nicht gefunden.</p>";
+        return;
+    }
 
-    for (let addon of addons) {
-        if (addon.getAttribute("id") === addonId) {
-            addonData.versions.push(addon.getAttribute("version"));
+    const name = found.getElementsByTagName("name")[0]?.textContent || addonId;
+    const version = found.getAttribute("version") || "unbekannt";
+    const provider = found.getAttribute("provider-name") || "unbekannt";
+    const desc = getBestDescription(found);
+
+    const downloads = found.getElementsByTagName("asset");
+    let downloadLink = null;
+
+    for (let d of downloads) {
+        if (d.getAttribute("type") === "zip") {
+            downloadLink = d.textContent;
+            break;
         }
     }
 
-    addonData.versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+    if (!downloadLink) {
+        downloadLink = addonId + "-" + version + ".zip";
+    }
 
-    document.getElementById("addonName").textContent = addonData.name;
-    document.getElementById("addonCategory").textContent = addonData.category;
-    document.getElementById("addonDesc").textContent = shorten(addonData.desc, 500);
-
-    const versionList = document.getElementById("versionList");
-
-    addonData.versions.forEach(version => {
-        const row = document.createElement("div");
-        row.className = "version";
-
-        const zipName = `${addonId}-${version}.zip`;
-
-        row.innerHTML = `
-            <span>Version ${version}</span>
-            <a class="download-btn" href="${zipName}" download>Download</a>
-        `;
-
-        versionList.appendChild(row);
-    });
+    document.getElementById("content").innerHTML = `
+        <div class="section">
+            <div class="title">${name}</div>
+            <div class="label">Version: ${version}</div>
+            <div class="label">Anbieter: ${provider}</div>
+            <div class="desc">${desc}</div>
+            <a class="download" href="${downloadLink}">ZIP herunterladen</a>
+        </div>
+    `;
 }
 
 loadAddon();
@@ -201,3 +171,4 @@ loadAddon();
 
 </body>
 </html>
+
