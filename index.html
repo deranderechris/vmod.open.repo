@@ -59,6 +59,7 @@
         text-align: center;
         transition: transform 0.2s, box-shadow 0.2s;
         border: 1px solid #0bb4a2;
+        cursor: pointer;
     }
 
     .addon:hover {
@@ -80,32 +81,9 @@
         margin-bottom: 5px;
     }
 
-    .addon-version {
+    .addon-category {
         font-size: 14px;
         color: #aaa;
-        margin-bottom: 10px;
-    }
-
-    .addon-desc {
-        font-size: 13px;
-        color: #ccc;
-        height: 40px;
-        overflow: hidden;
-        margin-bottom: 10px;
-    }
-
-    .btn {
-        display: inline-block;
-        padding: 10px 15px;
-        background: #0bb4a2;
-        color: #000;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-    .btn:hover {
-        background: #0ee3cc;
     }
 </style>
 </head>
@@ -119,18 +97,12 @@
     <select id="categoryFilter">
         <option value="all">Alle Kategorien</option>
     </select>
-    <select id="sort">
-        <option value="az">Sortierung: A–Z</option>
-        <option value="za">Sortierung: Z–A</option>
-        <option value="newest">Neueste Version zuerst</option>
-        <option value="oldest">Älteste Version zuerst</option>
-    </select>
 </div>
 
 <div class="grid" id="addonGrid"></div>
 
 <script>
-let addonList = [];
+let addonsById = {};
 
 async function loadAddons() {
     const response = await fetch("addons.xml");
@@ -161,11 +133,13 @@ async function loadAddons() {
 
         categories.add(category);
 
-        addonList.push({
-            id, version, name, desc, icon,
-            zip: `${id}-${version}.zip`,
-            category
-        });
+        if (!addonsById[id]) {
+            addonsById[id] = {
+                id, name, desc, icon, category, versions: []
+            };
+        }
+
+        addonsById[id].versions.push(version);
     }
 
     const catSelect = document.getElementById("categoryFilter");
@@ -185,29 +159,21 @@ function renderAddons() {
 
     const searchTerm = document.getElementById("search").value.toLowerCase();
     const selectedCat = document.getElementById("categoryFilter").value;
-    const sortMode = document.getElementById("sort").value;
 
-    let filtered = addonList.filter(a =>
-        a.name.toLowerCase().includes(searchTerm) &&
-        (selectedCat === "all" || a.category === selectedCat)
-    );
+    Object.values(addonsById).forEach(addon => {
+        if (!addon.name.toLowerCase().includes(searchTerm)) return;
+        if (selectedCat !== "all" && addon.category !== selectedCat) return;
 
-    if (sortMode === "az") filtered.sort((a, b) => a.name.localeCompare(b.name));
-    if (sortMode === "za") filtered.sort((a, b) => b.name.localeCompare(a.name));
-    if (sortMode === "newest") filtered.sort((a, b) => b.version.localeCompare(a.version));
-    if (sortMode === "oldest") filtered.sort((a, b) => a.version.localeCompare(b.version));
-
-    filtered.forEach(addon => {
         const card = document.createElement("div");
         card.className = "addon";
+        card.onclick = () => {
+            window.location.href = `addon.html?id=${addon.id}`;
+        };
 
         card.innerHTML = `
-            <img src="${addon.icon}" alt="${addon.name}">
+            <img src="${addon.icon}">
             <div class="addon-title">${addon.name}</div>
-            <div class="addon-version">Version: ${addon.version}</div>
-            <div class="addon-desc">${addon.desc}</div>
-            <div style="margin-bottom:10px;color:#0bb4a2;">${addon.category}</div>
-            <a class="btn" href="${addon.zip}" download>Download</a>
+            <div class="addon-category">${addon.category}</div>
         `;
 
         grid.appendChild(card);
@@ -216,7 +182,6 @@ function renderAddons() {
 
 document.getElementById("search").addEventListener("input", renderAddons);
 document.getElementById("categoryFilter").addEventListener("change", renderAddons);
-document.getElementById("sort").addEventListener("change", renderAddons);
 
 loadAddons();
 </script>
