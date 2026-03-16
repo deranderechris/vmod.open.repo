@@ -1,4 +1,4 @@
-<!-- rebuild5 -->
+<!-- rebuild-addon2 -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -19,182 +19,228 @@
         text-align: center;
         background: #111;
         border-bottom: 2px solid #333;
-        font-size: 28px;
+        font-size: 26px;
         font-weight: bold;
-        color: #ffffff;
     }
 
-    #controls {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
+    .container {
         padding: 20px;
-        flex-wrap: wrap;
+        max-width: 900px;
+        margin: auto;
     }
 
-    select, input {
-        padding: 10px;
-        border-radius: 6px;
-        border: none;
-        background: #1a1a1a;
-        color: #ffffff;
-        outline: 1px solid #444;
+    .desc {
+        margin-top: 10px;
+        color: #cccccc;
         font-size: 15px;
+        line-height: 1.5;
     }
 
-    #search {
-        width: 260px;
+    .category {
+        margin-top: 5px;
+        color: #888;
+        font-size: 14px;
     }
 
-    .list {
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+    .versions-title {
+        margin-top: 30px;
+        font-size: 20px;
+        font-weight: bold;
+        border-bottom: 1px solid #333;
+        padding-bottom: 8px;
     }
 
-    .addon {
+    .version {
         background: #1a1a1a;
         border: 1px solid #333;
         border-radius: 6px;
         padding: 15px;
-        cursor: pointer;
+        margin-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .version span {
+        font-size: 16px;
+        color: #ffffff;
+    }
+
+    .download-btn {
+        padding: 8px 14px;
+        background: #333;
+        color: #ffffff;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        border: 1px solid #444;
         transition: background 0.2s;
     }
 
-    .addon:hover {
-        background: #222;
+    .download-btn:hover {
+        background: #444;
     }
 
-    .addon-title {
-        font-size: 20px;
-        font-weight: bold;
-        color: #ffffff;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .addon-category {
+    .back {
+        margin-top: 25px;
+        display: inline-block;
+        color: #aaa;
         font-size: 14px;
-        color: #888;
+        text-decoration: none;
     }
 
-    .addon-desc {
-        margin-top: 6px;
-        font-size: 14px;
-        color: #cccccc;
-        max-height: 40px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .back:hover {
+        color: #fff;
     }
 </style>
 </head>
 
 <body>
 
-<header>VMOD Open Repository</header>
+<header>D.A. Offene Kodi Repo</header>
 
-<div id="controls">
-    <input id="search" type="text" placeholder="Addons durchsuchen…">
-    <select id="categoryFilter">
-        <option value="all">Alle Kategorien</option>
-    </select>
+<div class="container">
+    <h2 id="addonName"></h2>
+    <div class="category" id="addonCategory"></div>
+    <div class="desc" id="addonDesc"></div>
+
+    <div class="versions-title">Versionen</div>
+    <div id="versionList"></div>
+
+    <a href="index.html" class="back">← Zurück zur Übersicht</a>
 </div>
 
-<div class="list" id="addonList"></div>
-
 <script>
-let addonsById = {};
-
-function shorten(text, max = 80) {
+function shorten(text, max = 200) {
     return text.length > max ? text.substring(0, max) + "…" : text;
 }
 
-async function loadAddons() {
+// automatische Übersetzung
+function translateToGerman(text) {
+    const replacements = {
+        "addon": "Addon",
+        "favorites": "Favoriten",
+        "favourites": "Favoriten",
+        "improves": "verbessert",
+        "improve": "verbessern",
+        "experience": "Erlebnis",
+        "management": "Verwaltung",
+        "manager": "Manager",
+        "flow": "Flow",
+        "simple": "einfach",
+        "advanced": "erweitert",
+        "settings": "Einstellungen",
+        "tools": "Werkzeuge",
+        "videos": "Videos",
+        "video": "Video",
+        "live": "Live",
+        "channels": "Kanäle",
+        "channel": "Kanal",
+        "stream": "Stream",
+        "streams": "Streams",
+        "content": "Inhalt",
+        "adult": "Erwachsenen",
+        "porn": "Erotik",
+        "sport": "Sport",
+        "music": "Musik"
+    };
+
+    let result = text;
+
+    for (const [en, de] of Object.entries(replacements)) {
+        const regex = new RegExp("\\b" + en + "\\b", "gi");
+        result = result.replace(regex, de);
+    }
+
+    return result;
+}
+
+// beste Beschreibung auswählen
+function getBestDescription(addon) {
+    const descriptions = addon.getElementsByTagName("description");
+
+    let de = null, en = null, fallback = null;
+
+    for (let d of descriptions) {
+        const lang = d.getAttribute("lang");
+
+        if (lang === "de") de = d.textContent;
+        else if (lang === "en") en = d.textContent;
+        else if (!lang) fallback = d.textContent;
+    }
+
+    if (de) return de;
+    if (en) return translateToGerman(en);
+    if (fallback) return translateToGerman(fallback);
+
+    return "";
+}
+
+async function loadAddon() {
+    const params = new URLSearchParams(window.location.search);
+    const addonId = params.get("id");
+
     const response = await fetch("addons.xml");
     const xmlText = await response.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(xmlText, "text/xml");
 
     const addons = xml.getElementsByTagName("addon");
-    const categories = new Set();
+    let addonData = null;
 
     for (let addon of addons) {
-        const id = addon.getAttribute("id");
-        const version = addon.getAttribute("version");
-        const name = addon.getElementsByTagName("name")[0]?.textContent || id;
-        const desc = addon.getElementsByTagName("description")[0]?.textContent || "";
+        if (addon.getAttribute("id") === addonId) {
+            const name = addon.getElementsByTagName("name")[0]?.textContent || addonId;
+            const desc = getBestDescription(addon);
 
-        let category = "Sonstiges";
-        const ext = addon.getElementsByTagName("extension")[0];
-        if (ext) {
-            const point = ext.getAttribute("point") || "";
-            if (point.includes("video")) category = "Video";
-            else if (point.includes("audio")) category = "Audio";
-            else if (point.includes("program")) category = "Programme";
-            else if (point.includes("skin")) category = "Skins";
-            else if (point.includes("repository")) category = "Repository";
+            let category = "Sonstiges";
+            const ext = addon.getElementsByTagName("extension")[0];
+            if (ext) {
+                const point = ext.getAttribute("point") || "";
+                if (point.includes("video")) category = "Video";
+                else if (point.includes("audio")) category = "Audio";
+                else if (point.includes("program")) category = "Programm";
+                else if (point.includes("script")) category = "Script";
+                else if (point.includes("skin")) category = "Skins";
+                else if (point.includes("repository")) category = "Repository";
+            }
+
+            addonData = { name, desc, category, versions: [] };
         }
-
-        categories.add(category);
-
-        if (!addonsById[id]) {
-            addonsById[id] = {
-                id, name, desc, category, versions: []
-            };
-        }
-
-        addonsById[id].versions.push(version);
     }
 
-    const sortedCats = Array.from(categories).sort();
+    if (!addonData) return;
 
-    const catSelect = document.getElementById("categoryFilter");
-    catSelect.innerHTML = `<option value="all">Alle Kategorien</option>`;
+    for (let addon of addons) {
+        if (addon.getAttribute("id") === addonId) {
+            addonData.versions.push(addon.getAttribute("version"));
+        }
+    }
 
-    sortedCats.forEach(cat => {
-        const opt = document.createElement("option");
-        opt.value = cat;
-        opt.textContent = cat;
-        catSelect.appendChild(opt);
-    });
+    addonData.versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
 
-    renderAddons();
-}
+    document.getElementById("addonName").textContent = addonData.name;
+    document.getElementById("addonCategory").textContent = addonData.category;
+    document.getElementById("addonDesc").textContent = shorten(addonData.desc, 500);
 
-function renderAddons() {
-    const list = document.getElementById("addonList");
-    list.innerHTML = "";
+    const versionList = document.getElementById("versionList");
 
-    const searchTerm = document.getElementById("search").value.toLowerCase();
-    const selectedCat = document.getElementById("categoryFilter").value;
-
-    Object.values(addonsById).forEach(addon => {
-        if (!addon.name.toLowerCase().includes(searchTerm)) return;
-        if (selectedCat !== "all" && addon.category !== selectedCat) return;
-
+    addonData.versions.forEach(version => {
         const row = document.createElement("div");
-        row.className = "addon";
-        row.onclick = () => {
-            window.location.href = `addon.html?id=${addon.id}`;
-        };
+        row.className = "version";
+
+        const zipName = `${addonId}-${version}.zip`;
 
         row.innerHTML = `
-            <div class="addon-title">
-                <span>${shorten(addon.name, 60)}</span>
-                <span class="addon-category">${addon.category}</span>
-            </div>
-            <div class="addon-desc">${shorten(addon.desc, 160)}</div>
+            <span>Version ${version}</span>
+            <a class="download-btn" href="${zipName}" download>Download</a>
         `;
 
-        list.appendChild(row);
+        versionList.appendChild(row);
     });
 }
 
-document.getElementById("search").addEventListener("input", renderAddons);
-document.getElementById("categoryFilter").addEventListener("change", renderAddons);
-
-loadAddons();
+loadAddon();
 </script>
 
 </body>
